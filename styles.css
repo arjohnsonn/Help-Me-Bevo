@@ -1,0 +1,49 @@
+#video-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+#video-overlay.show {
+  visibility: visible;
+  opacity: 1;
+}
+#video {
+  max-width: 90%;
+  max-height: 90%;
+}
+
+/* Extension */
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 23px;
+  height: 24px;
+  border: 0;
+  background: url("contrasticon.png");
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 23px;
+  height: 25px;
+  border: 0;
+  background: url("contrasticon.png");
+  cursor: pointer;
+}
+
+.centered {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
