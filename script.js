@@ -2,6 +2,15 @@ const debug = false;
 
 // Init play button
 if (debug) {
+  const element = document.createElement("div");
+  element.innerHTML = `<button
+      id="play"
+      style="background-color: #ffa600; padding: 10px 10px 10px 10px"
+    >
+      Play
+    </button>`;
+  document.head.appendChild(element);
+
   const play = document.getElementById("play");
 
   play.addEventListener("click", () => {
@@ -13,6 +22,11 @@ var slider = document.getElementById("volumeSlider");
 var output = document.getElementById("volumeOutput");
 
 load("volume", function (value) {
+  if (value == null || !value) {
+    value = 0.5;
+    save("volume", value);
+  }
+
   sendMessage(["print", value]);
   output.innerHTML = `Volume: ${value}`;
   slider.value = value;
@@ -23,7 +37,7 @@ load("volume", function (value) {
 slider.oninput = function () {
   output.innerHTML = `Volume: ${this.value}`;
 
-  debug ? sendMessage(["updateVolume", Number(this.value)]) : null;
+  debug ? sendMessage(["updateVolume", Number(this.value / 100)]) : null;
 };
 
 slider.addEventListener("mouseup", function () {
@@ -35,8 +49,8 @@ slider.addEventListener("mouseup", function () {
 var toggleButton = document.getElementById("toggle");
 var enabled = true;
 load("enabled", function (value) {
-  if (!value || value == null) {
-    enabled = true;
+  if (value == null) {
+    value = true;
   }
 
   debug ? sendMessage(["print", value]) : null;
@@ -83,13 +97,13 @@ function sendMessage(message) {
 }
 
 function save(key, value) {
-  chrome.storage.sync.set({ [key]: value }).then(() => {
+  chrome.storage.local.set({ [key]: value }).then(() => {
     debug ? sendMessage(["print", "Saved " + key + ": " + value]) : null;
   });
 }
 
 function load(key, callback) {
-  chrome.storage.sync.get([key]).then((result) => {
+  chrome.storage.local.get([key]).then((result) => {
     debug
       ? sendMessage(["print", "Value of " + key + " is " + result[key]])
       : null;
