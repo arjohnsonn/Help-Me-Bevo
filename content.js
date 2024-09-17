@@ -23,12 +23,21 @@ const video = document.getElementById("video");
 var enabled = true;
 
 load("enabled", function (value) {
+  if (value == null) {
+    value = true;
+  }
+
   enabled = value;
 
   debug ? console.log(`${name}: ${value}`) : null;
 });
 
 load("volume", function (value) {
+  if (value == null || !value) {
+    value = volume;
+    save("volume", volume);
+  }
+
   value = clamp(value, 0, 1);
 
   updateVolume([null, value]);
@@ -68,6 +77,8 @@ function clamp(value, min, max) {
 }
 
 function displayBevo() {
+  debug ? console.log(enabled) : null;
+
   if (!enabled) return;
 
   videoOverlay.classList.add("show");
@@ -80,7 +91,7 @@ function log(message) {
 
 function updateVolume(value) {
   value = value[1];
-  volume = clamp(value / 100, 0, 1);
+  volume = clamp(value, 0, 1);
 
   video.volume = volume;
 
@@ -103,7 +114,9 @@ function initButton() {
     document.removeEventListener("mousemove", initButton);
 
     button.addEventListener("click", () => {
-      console.log(`${name}: Submit clicked!`);
+      debug ? console.log(`${name}: Submit clicked!`) : null;
+      debug ? console.log(button.disabled) : null;
+
       if (!button.disabled) {
         // Action to be performed when the button is clicked
         displayBevo();
@@ -135,13 +148,13 @@ function waitForElm(selector) {
 }
 
 function save(key, value) {
-  chrome.storage.sync.set({ [key]: value }).then(() => {
-    console.log("Saved " + key + ": " + value);
+  chrome.storage.local.set({ [key]: value }).then(() => {
+    debug ? console.log("Saved " + key + ": " + value) : null;
   });
 }
 
 function load(key, callback) {
-  chrome.storage.sync.get([key]).then((result) => {
+  chrome.storage.local.get([key]).then((result) => {
     value = result[key];
 
     callback(value);
