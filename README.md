@@ -9,4 +9,4 @@ see the Bevo 3rd down animation when you submit a Canvas assignment for extra mo
   - Volume
  
 ## Link to Extension: 
-<i>[Pending Store Review]</i>
+https://chromewebstore.google.com/detail/help-me-bevo/igepffgmogjaehnlpgepliimadegcapd
