@@ -144,12 +144,12 @@ function updateToggle() {
   toggleButton.innerHTML = `<b> Extension: ${enabled ? "ON" : "OFF"}</b>`;
   toggleButton.style.backgroundColor = enabled ? "#8aff88" : "#ff8888";
 
-  const addition = enabled ? "show" : "hidden";
-  const remove = !enabled ? "show" : "hidden";
-
   settingsDivs.forEach((element) => {
-    element.classList.add(addition);
-    element.classList.remove(remove);
+    if (enabled) {
+      element.classList.remove("hidden");
+    } else {
+      element.classList.add("hidden");
+    }
   });
 
   sendMessage(["toggle", enabled]);
