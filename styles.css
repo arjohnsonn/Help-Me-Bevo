@@ -1,5 +1,10 @@
-.hidden {
-  display: none;
+.show {
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.hiddenElm {
+  visibility: hidden;
   opacity: 0;
   max-height: 0;
 }
@@ -14,8 +19,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
   visibility: hidden;
+  z-index: 9999;
   opacity: 0;
   transition: opacity 0.25s ease;
 }
