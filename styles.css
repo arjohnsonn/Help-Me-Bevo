@@ -1,18 +1,7 @@
-body {
-  min-width: 120px;
-  width: 180px;
-}
-
-.show {
-  visibility: visible;
-  display: initial;
-  opacity: 1;
-}
-
 .hidden {
-  visibility: hidden;
   display: none;
   opacity: 0;
+  max-height: 0;
 }
 
 #video-overlay {
