@@ -37,6 +37,6 @@ These instructions are for installing via the ZIP file from the GitHub release.
 
 <i>Note: These will not receive automatic updates from the Chrome Web Store. It is <b>recommended to download from the web store instead</b> for convenience.</i>
 
-### Credit
+## Credit
 Thank you to the YikYak community for originally suggesting this idea!
 The idea originally came from YikYak, and it was upvoted a ton. I needed to work on some side projects, so it was the perfect opportunity to create an extension. Not only build my portfolio but also please the UT students (and of course for the assignment motivation). Hook 'em!
