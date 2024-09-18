@@ -1,4 +1,5 @@
 const videoURL = "https://aidenjohnson.dev/Images/Bevo.mp4";
+const fullVideoURL = "https://aidenjohnson.dev/Images/BevoCrop.mp4";
 const name = "Help Me Bevo"; // Name of Extension
 const debug = false;
 var volume = 0.5;
@@ -24,6 +25,7 @@ var enabled = true;
 var assignments = true;
 var quizzes = false;
 var other = true;
+var fullScreen = true;
 
 /**
  * LOAD SETTINGS
@@ -59,6 +61,14 @@ load("other", function (value) {
   }
 
   other = value;
+});
+
+load("fullScreen", function (value) {
+  if (value == null) {
+    value = true;
+  }
+
+  fullScreen = value;
 });
 
 load("volume", function (value) {
@@ -159,6 +169,8 @@ function changeValue(data) {
       quizzes = value;
     case "other":
       other = value;
+    case "fullScreen":
+      fullScreen = value;
   }
 }
 
@@ -178,8 +190,17 @@ function displayBevo(type) {
   if (type == "quizzes" && !quizzes) return;
   if (type == "other" && !other) return;
 
-  videoOverlay.classList.add("show");
-  video.play();
+  const max = fullScreen ? "100%" : "90%";
+  video.style.maxWidth = max;
+  video.style.maxHeight = max;
+
+  video.src = fullScreen ? fullVideoURL : videoURL;
+  video.pause();
+
+  setTimeout(() => {
+    videoOverlay.classList.add("show");
+    video.play();
+  }, 100);
 }
 
 function log(message) {
