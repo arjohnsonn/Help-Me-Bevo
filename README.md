@@ -18,6 +18,7 @@ Let Bevo take that burden away, and see his infamous 3rd down animation (the OG 
     - Quizzes
     - Other (buttons with "Submit" in them)
   - Volume
+  - Full Screen Mode
 - Random UT Theme Quote
 
 ## Link to Extension:
