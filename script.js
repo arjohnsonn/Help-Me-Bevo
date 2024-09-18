@@ -60,14 +60,21 @@ const settingsDivs = document.querySelectorAll(".settings");
 const assignmentSlider = document.getElementById("assignments");
 const quizzesSlider = document.getElementById("quizzes");
 const otherSlider = document.getElementById("other");
+const fullScreenSlider = document.getElementById("fullScreen");
 
 const sliderSaveKeys = {
   [assignmentSlider]: "assignments",
   [quizzesSlider]: "quizzes",
   [otherSlider]: "other",
+  [fullScreenSlider]: "fullScreen",
 };
 
-const sliders = [assignmentSlider, quizzesSlider, otherSlider];
+const sliders = [
+  assignmentSlider,
+  quizzesSlider,
+  otherSlider,
+  fullScreenSlider,
+];
 sliders.forEach((settingSlider) => {
   settingSlider.addEventListener("change", () => {
     const value = settingSlider.checked;
@@ -107,6 +114,16 @@ load("other", function (value) {
   }
 
   updateSlider(otherSlider, value);
+});
+
+load("fullScreen", function (value) {
+  if (value == null) {
+    value = true;
+
+    save("fullScreen", true);
+  }
+
+  updateSlider(fullScreenSlider, value);
 });
 
 /**
