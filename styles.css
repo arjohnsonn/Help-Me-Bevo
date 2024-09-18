@@ -1,3 +1,20 @@
+body {
+  min-width: 120px;
+  width: 180px;
+}
+
+.show {
+  visibility: visible;
+  display: initial;
+  opacity: 1;
+}
+
+.hidden {
+  visibility: hidden;
+  display: none;
+  opacity: 0;
+}
+
 #video-overlay {
   position: fixed;
   top: 0;
@@ -13,10 +30,7 @@
   opacity: 0;
   transition: opacity 0.25s ease;
 }
-#video-overlay.show {
-  visibility: visible;
-  opacity: 1;
-}
+
 #video {
   max-width: 90%;
   max-height: 90%;
@@ -30,7 +44,6 @@
   width: 23px;
   height: 24px;
   border: 0;
-  background: url("contrasticon.png");
   cursor: pointer;
 }
 
@@ -38,7 +51,6 @@
   width: 23px;
   height: 25px;
   border: 0;
-  background: url("contrasticon.png");
   cursor: pointer;
 }
 
@@ -46,4 +58,68 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* Credits to W3Schools for the open-source switches */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 20px;
+  margin-left: 10px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.toggleslider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+
+.toggleslider:before {
+  position: absolute;
+  content: "";
+  height: 15px;
+  width: 15px;
+  left: 3.5px;
+  bottom: 2.8px;
+  background-color: white;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+
+input:checked + .toggleslider {
+  background-color: #2196f3;
+}
+
+input:focus + .toggleslider {
+  box-shadow: 0 0 1px #2196f3;
+}
+
+input:checked + .toggleslider:before {
+  -webkit-transform: translateX(18px);
+  -ms-transform: translateX(18px);
+  transform: translateX(18px);
+}
+
+/* Rounded sliders */
+.toggleslider.round {
+  border-radius: 34px;
+}
+
+.toggleslider.round:before {
+  border-radius: 50%;
 }

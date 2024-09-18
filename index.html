@@ -15,18 +15,57 @@
       <br />
     </div>
 
+    <!-- Enable/Disable -->
     <div class="centered">
       <button
         id="toggle"
         class="vertical-center"
-        style="background-color: #8aff88; padding: 10px 10px 10px 10px"
+        style="
+          background-color: #8aff88;
+          padding: 10px 10px 10px 10px;
+          border-radius: 15px;
+        "
       >
         <b> Extension: ON</b>
       </button>
     </div>
 
-    <h3 id="volumeOutput">Volume: 50%</h3>
-    <div id="volumeDiv">
+    <br />
+
+    <!-- Display Settings -->
+    <div class="settings">
+      <div class="centered" style="margin: -1vh">
+        <h3>Assignments</h3>
+        <label class="switch">
+          <input id="assignments" type="checkbox" />
+          <span class="toggleslider round"></span>
+        </label>
+      </div>
+      <div class="centered" style="margin: -4vh">
+        <h3>Quizzes</h3>
+        <label class="switch">
+          <input id="quizzes" type="checkbox" />
+          <span class="toggleslider round"></span>
+        </label>
+      </div>
+      <div class="centered" style="margin: -4vh">
+        <h3>Other</h3>
+        <label class="switch">
+          <input id="other" type="checkbox" />
+          <span class="toggleslider round"></span>
+        </label>
+      </div>
+    </div>
+
+    <br />
+
+    <!-- VOLUME -->
+    <h3 class="settings centered" id="volumeOutput">Volume: 50%</h3>
+    <div
+      class="settings centered"
+      style="transform: translateY(-3vh)"
+      id="volumeDiv"
+    >
       <input
         type="range"
         min="0"
@@ -39,6 +78,10 @@
 
     <!-- SOCIALS -->
     <br />
+    <i class="centered" style="text-align: center"
+      >DM me for any concerns or suggestions!</i
+    >
+    <br />
     <b class="centered">Made by</b>
     <div class="centered">
       <a href="https://www.instagram.com/aidenn.johnson/" target="_blank"
@@ -46,6 +89,10 @@
       >
     </div>
 
+    <br />
+    <i class="centered" id="random-quote" style="text-align: center"
+      >Hook 'Em!</i
+    >
     <!-- SCRIPTS -->
     <script src="script.js"></script>
   </body>
