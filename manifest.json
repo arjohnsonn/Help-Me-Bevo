@@ -1,6 +1,6 @@
 {
   "name": "Help Me Bevo",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "See the Bevo 3rd down animation when you submit a Canvas assignment",
   "manifest_version": 3,
   "author": "Aiden Johnson",
@@ -12,7 +12,7 @@
   "permissions": ["activeTab", "storage"],
   "content_scripts": [
     {
-      "matches": ["https://*.instructure.com/*"],
+      "matches": ["<all_urls>"],
       "js": ["content.js"],
       "css": ["styles.css"]
     }
