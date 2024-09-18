@@ -1,7 +1,10 @@
 # Help Me Bevo
 
 A chrome extension;
-see the Bevo 3rd down animation when you submit a Canvas assignment for extra motivation to complete assignments!
+See the Bevo 3rd down animation when you submit a Canvas assignment
+
+Tired of being demotivated to get assignments done? 
+Let Bevo take that burden away, and see his infamous 3rd down animation (the OG one) every time you submit a Canvas assignment. 
 
 ![Extension Image](https://lh3.googleusercontent.com/nV0uRjXJ9PRps2P3YY9rYKPUT-yYxGjKgwpmO6njmjV1kXdv4rJNr6LxXtz1gRBOB1eKHVyj6CPcpI_Kf791uBfV1jw=s1280-w1280-h800)
 
