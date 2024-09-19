@@ -190,9 +190,7 @@ function displayBevo(type) {
   if (type == "quizzes" && !quizzes) return;
   if (type == "other" && !other) return;
 
-  const max = fullScreen ? "100%" : "90%";
-  video.style.maxWidth = max;
-  video.style.maxHeight = max;
+  video.style.width = fullScreen ? "100%" : "90%";
 
   video.src = fullScreen ? fullVideoURL : videoURL;
   video.pause();
