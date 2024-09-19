@@ -25,11 +25,6 @@
   transition: opacity 0.25s ease;
 }
 
-#video {
-  max-width: 90%;
-  max-height: 90%;
-}
-
 /* Extension */
 
 .slider::-webkit-slider-thumb {
