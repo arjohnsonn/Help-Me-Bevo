@@ -72,7 +72,7 @@ load("fullScreen", function (value) {
 });
 
 load("volume", function (value) {
-  if (value == null || !value) {
+  if (value == null) {
     value = volume;
     save("volume", volume);
   }

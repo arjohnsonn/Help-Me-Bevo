@@ -7,14 +7,14 @@ var slider = document.getElementById("volumeSlider");
 var output = document.getElementById("volumeOutput");
 
 load("volume", function (value) {
-  if (value == null || !value) {
+  if (value == null) {
     value = 0.5;
     save("volume", value);
   }
 
   sendMessage(["print", value]);
-  output.innerHTML = `Volume: ${value}`;
-  slider.value = value;
+  output.innerHTML = `Volume: ${value * 100}`;
+  slider.value = value * 100;
 
   sendMessage(["updateVolume", Number(value)]);
 });
@@ -26,7 +26,7 @@ slider.oninput = function () {
 };
 
 slider.addEventListener("mouseup", function () {
-  save("volume", this.value);
+  save("volume", this.value / 100);
 });
 
 /**
