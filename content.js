@@ -21,11 +21,15 @@ document.body.appendChild(overlayElement);
 const videoDiv = document.getElementById("volumeDiv");
 const videoOverlay = document.getElementById("video-overlay");
 const video = document.getElementById("video");
+
 var enabled = true;
 var assignments = true;
 var quizzes = false;
 var other = true;
 var fullScreen = true;
+var classroom = true;
+var gradescope = true;
+var playing = false;
 
 /**
  * LOAD SETTINGS
@@ -82,6 +86,37 @@ load("volume", function (value) {
   updateVolume([null, value]);
 });
 
+load("classroom", function (value) {
+  if (value == null) {
+    value = true;
+  }
+
+  classroom = value;
+});
+
+load("gradescope", function (value) {
+  if (value == null) {
+    value = true;
+  }
+
+  gradescope = value;
+});
+
+load("playing", function (value) {
+  if (value == null) return;
+
+  const time = value[0];
+  const wasPlaying = value[1];
+  const type = value[2];
+
+  if (wasPlaying && Date.now() / 1000 - time < 4) {
+    video.muted = true;
+    displayBevo(type);
+  } else if (wasPlaying) {
+    save("playing", null);
+  }
+});
+
 /**
  * EVENTS & LISTENERS
  */
@@ -95,14 +130,20 @@ const listenerFuncs = {
   changeValue: changeValue,
 };
 
+document.addEventListener("click", () => {
+  video.muted = false;
+});
+
 video.addEventListener("ended", () => {
   videoOverlay.classList.remove("show");
+  setPlaying(false);
+
+  video.muted = false;
 });
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request == null) return;
 
-  console.log(request);
   const action = request[0];
   if (listenerFuncs[action]) {
     listenerFuncs[action](request);
@@ -134,13 +175,20 @@ const callback = (mutationList, observer) => {
     if (mutation.type === "childList") {
       mutation.addedNodes.forEach((node) => {
         if (node.nodeName === "BUTTON") {
-          if (isSubmitButton(node)) initButton(node, "other");
+          if (isSubmitButton(node, true)) initButton(node, "other");
         } else if (node.nodeType === 1) {
           // nodeType 1 is an Element
 
           const buttons = node.querySelectorAll("button");
 
           buttons.forEach((button) => {
+            if (isSubmitButton(button, true)) {
+              initButton(button, "other");
+            }
+          });
+
+          const buttonDivs = document.querySelectorAll('div[role="button"]');
+          buttonDivs.forEach((button) => {
             if (isSubmitButton(button)) {
               initButton(button, "other");
             }
@@ -171,13 +219,35 @@ function changeValue(data) {
       other = value;
     case "fullScreen":
       fullScreen = value;
+    case "classroom":
+      classroom = value;
+    case "gradescope":
+      gradescope = value;
   }
 }
 
-function isSubmitButton(element) {
-  if (element.textContent == null) return false;
+const submitTexts = ["Submit", "Upload"];
+const classroomText = ["Turn in", "Mark as done"];
+function isSubmitButton(element, isButton) {
+  if (element.textContent == null || element.id == "submit_quiz_button")
+    return false;
 
-  return element.textContent.trim().includes("Submit");
+  // Check settings
+  for (const text of submitTexts) {
+    if (!gradescope && text == "Upload") continue;
+
+    const textContent = element.textContent.trim();
+    if (textContent.includes(text) && !textContent.includes("Quiz"))
+      return true;
+  }
+
+  if (!isButton && classroom) {
+    for (const text of classroomText) {
+      if (element.textContent.trim() == text) return true;
+    }
+  }
+
+  return false;
 }
 
 function clamp(value, min, max) {
@@ -196,9 +266,16 @@ function displayBevo(type) {
   video.pause();
 
   setTimeout(() => {
+    setPlaying(true, type);
     videoOverlay.classList.add("show");
     video.play();
   }, 100);
+}
+
+function setPlaying(value, type) {
+  playing = value;
+
+  save("playing", [Date.now() / 1000, value, type]);
 }
 
 function log(message) {
@@ -269,25 +346,23 @@ function load(key, callback) {
   });
 }
 
-if (debug) {
-  function addSubmit() {
-    // For debugging
-    addDiv(`<button
-      id="play"
-      style="z-index:99999; padding: 10px 10px 10px 10px; position: absolute"
-    >
-      Submit
-    </button>`);
-  }
+function addSubmit() {
+  // For debugging
+  addDiv(`<button
+    id="submit_quiz_button"
+    style="z-index:99999; padding: 10px 10px 10px 10px; position: absolute"
+  >
+    Submit
+  </button>`);
+}
 
-  function addDiv(overlayHTML) {
-    // For debugging
-    const innerHTML = overlayHTML;
+function addDiv(overlayHTML) {
+  // For debugging
+  const innerHTML = overlayHTML;
 
-    const overlayElement = document.createElement("div");
-    overlayElement.innerHTML = innerHTML;
-    document.body.appendChild(overlayElement);
-  }
+  const overlayElement = document.createElement("div");
+  overlayElement.innerHTML = innerHTML;
+  document.body.appendChild(overlayElement);
 }
 
 console.log("content.js loaded");

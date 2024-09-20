@@ -61,12 +61,16 @@ const assignmentSlider = document.getElementById("assignments");
 const quizzesSlider = document.getElementById("quizzes");
 const otherSlider = document.getElementById("other");
 const fullScreenSlider = document.getElementById("fullScreen");
+const classroomSlider = document.getElementById("classroom");
+const gradescopeSlider = document.getElementById("gradescope");
 
 const sliderSaveKeys = {
   [assignmentSlider]: "assignments",
   [quizzesSlider]: "quizzes",
   [otherSlider]: "other",
   [fullScreenSlider]: "fullScreen",
+  [classroomSlider]: "classroom",
+  [gradescopeSlider]: "gradescope",
 };
 
 const sliders = [
@@ -74,7 +78,10 @@ const sliders = [
   quizzesSlider,
   otherSlider,
   fullScreenSlider,
+  classroomSlider,
+  gradescopeSlider,
 ];
+
 sliders.forEach((settingSlider) => {
   settingSlider.addEventListener("change", () => {
     const value = settingSlider.checked;
@@ -126,6 +133,25 @@ load("fullScreen", function (value) {
   updateSlider(fullScreenSlider, value);
 });
 
+load("classroom", function (value) {
+  if (value == null) {
+    value = true;
+
+    save("classroom", true);
+  }
+
+  updateSlider(classroomSlider, value);
+});
+
+load("gradescope", function (value) {
+  if (value == null) {
+    value = true;
+
+    save("gradescope", true);
+  }
+
+  updateSlider(gradescopeSlider, value);
+});
 /**
  * OTHER
  */
@@ -138,6 +164,7 @@ const quotes = [
   "can we please pet bevo",
   "natty bounddd",
   "what is an aggie?😭",
+  "fix the big ticket system pls",
 ];
 
 quote.textContent = quotes[Math.floor(Math.random() * quotes.length)];
