@@ -9,6 +9,12 @@
   max-height: 0;
 }
 
+.hidden {
+  display: none;
+  opacity: 0;
+  max-height: 0;
+}
+
 #video-overlay {
   position: fixed;
   top: 0;

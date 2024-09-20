@@ -229,7 +229,11 @@ function changeValue(data) {
 const submitTexts = ["Submit", "Upload"];
 const classroomText = ["Turn in", "Mark as done"];
 function isSubmitButton(element, isButton) {
-  if (element.textContent == null || element.id == "submit_quiz_button")
+  if (
+    element.textContent == null ||
+    element.id == "submit_quiz_button" ||
+    element.id == "submit-button"
+  )
     return false;
 
   // Check settings
