@@ -1,6 +1,6 @@
 # Help Me Bevo
 
-A chrome extension to see the <i>infamous</i> Bevo 3rd down animation when you submit a Canvas assignment!
+A extension to see the <i>infamous</i> Bevo 3rd down animation when you submit a Canvas assignment!
 
 Tired of being demotivated to get assignments done? 
 Let Bevo take that burden away, and see his infamous 3rd down animation (the OG one) every time you submit a Canvas assignment. 
@@ -23,13 +23,19 @@ Let Bevo take that burden away, and see his infamous 3rd down animation (the OG 
 
 ## Link to Extension:
 
-https://chromewebstore.google.com/detail/help-me-bevo/igepffgmogjaehnlpgepliimadegcapd
+<b>Chromium Browsers: </b>https://chromewebstore.google.com/detail/help-me-bevo/igepffgmogjaehnlpgepliimadegcapd 
+<br />
+<b>Firefox:</b> https://addons.mozilla.org/en-US/firefox/addon/help-me-bevo/
+<br />
+<br />
+[You can view all chromium browsers here](https://en.wikipedia.org/wiki/Chromium_(web_browser))
+
 
 ## Release Installation
 It is <b>recommended to download from the web store </b> for convenience.</i>
 Only install from the ZIP for experimental/testing purposes.
 
-These instructions are for installing via the ZIP file from the GitHub release.
+These instructions are for installing via the ZIP file from the GitHub release <i>for chromium based browsers only</i>.
 - Download the ZIP release
 - Go to the URL "chrome://extensions" (or go to your browser's Extensions page)
 - Turn on Developer Mode on the top right
