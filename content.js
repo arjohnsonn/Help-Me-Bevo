@@ -175,14 +175,20 @@ const callback = (mutationList, observer) => {
     if (mutation.type === "childList") {
       mutation.addedNodes.forEach((node) => {
         if (node.nodeName === "BUTTON") {
-          if (isSubmitButton(node, true)) initButton(node, "other");
+          if (node.id == "submit-button") {
+            initButton(node, "assignments");
+          } else {
+            if (isSubmitButton(node, true)) initButton(node, "other");
+          }
         } else if (node.nodeType === 1) {
           // nodeType 1 is an Element
 
           const buttons = node.querySelectorAll("button");
 
           buttons.forEach((button) => {
-            if (isSubmitButton(button, true)) {
+            if (button.id == "submit-button") {
+              initButton(button, "assignments");
+            } else if (isSubmitButton(button, true)) {
               initButton(button, "other");
             }
           });
@@ -229,18 +235,15 @@ function changeValue(data) {
 const submitTexts = ["Submit", "Upload"];
 const classroomText = ["Turn in", "Mark as done"];
 function isSubmitButton(element, isButton) {
-  if (
-    element.textContent == null ||
-    element.id == "submit_quiz_button" ||
-    element.id == "submit-button"
-  )
+  if (element.textContent == null || element.id == "submit_quiz_button")
     return false;
+
+  const textContent = element.textContent.trim();
 
   // Check settings
   for (const text of submitTexts) {
     if (!gradescope && text == "Upload") continue;
 
-    const textContent = element.textContent.trim();
     if (textContent.includes(text) && !textContent.includes("Quiz"))
       return true;
   }
@@ -301,16 +304,12 @@ function toggle(value) {
 
 function initButton(button, type) {
   if (button != null) {
-    document.removeEventListener("mousemove", initButton);
-
     button.addEventListener("click", () => {
-      if (!button.disabled) {
-        // Action to be performed when the button is clicked
-        displayBevo(type);
-      }
+      displayBevo(type);
     });
   }
 
+  console.trace();
   if (debug) console.log(`Initiated ${type}`);
 }
 
