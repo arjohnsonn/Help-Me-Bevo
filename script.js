@@ -6,13 +6,15 @@ const debug = false;
 var slider = document.getElementById("volumeSlider");
 var output = document.getElementById("volumeOutput");
 
+// Should load 0-1
 load("volume", function (value) {
   if (value == null) {
     value = 0.5;
     save("volume", value);
+  } else if (value > 1) {
+    value = clamp(value / 100, 0, 1);
   }
 
-  sendMessage(["print", value]);
   output.innerHTML = `Volume: ${value * 100}`;
   slider.value = value * 100;
 
@@ -215,6 +217,14 @@ function sendMessage(message) {
 }
 
 function save(key, value) {
+  if (key == "volume" && value > 1) {
+    value = clamp(value / 100, 0, 1);
+
+    // Debugging
+    console.log(value);
+    console.trace();
+  }
+
   chrome.storage.local.set({ [key]: value }).then(() => {
     if (debug) sendMessage(["print", "Saved " + key + ": " + value]);
   });

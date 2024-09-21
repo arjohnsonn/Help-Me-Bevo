@@ -50,6 +50,7 @@ load("other", true, function (value) {
 load("fullScreen", true, function (value) {
   fullScreen = value;
 });
+// Should load 0-1
 load("volume", null, function (value) {
   if (value == null) {
     value = volume;
@@ -308,6 +309,14 @@ function waitForElm(selector) {
 }
 
 function save(key, value) {
+  if (key == "volume" && value > 1) {
+    value = clamp(value / 100, 0, 1);
+
+    // Debugging
+    console.log(value);
+    console.trace();
+  }
+
   chrome.storage.local.set({ [key]: value }).then(() => {
     if (debug) console.log("Saved " + key + ": " + value);
   });
