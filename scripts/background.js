@@ -1,8 +1,8 @@
 const MEASUREMENT_ID = chrome.runtime.getManifest().env.measurement_id;
 const API_SECRET = chrome.runtime.getManifest().env.api_secret;
 const GA_ENDPOINT = "https://www.google-analytics.com/mp/collect";
-const DEFAULT_ENGAGEMENT_TIME_IN_MSEC = 100;
-const SESSION_EXPIRATION_IN_MIN = 30;
+const DEFAULT_ENGAGEMENT_TIME_IN_MSEC = 6000;
+const SESSION_EXPIRATION_IN_MIN = 5;
 
 chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   fetch(
