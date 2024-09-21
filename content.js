@@ -35,47 +35,22 @@ var playing = false;
  * LOAD SETTINGS
  */
 
-load("enabled", function (value) {
-  if (value == null) {
-    value = true;
-  }
-
+load("enabled", true, function (value) {
   enabled = value;
 });
-
-load("assignments", function (value) {
-  if (value == null) {
-    value = true;
-  }
-
+load("assignments", true, function (value) {
   assignments = value;
 });
-
-load("quizzes", function (value) {
-  if (value == null) {
-    value = true;
-  }
-
+load("quizzes", false, function (value) {
   quizzes = value;
 });
-
-load("other", function (value) {
-  if (value == null) {
-    value = true;
-  }
-
+load("other", true, function (value) {
   other = value;
 });
-
-load("fullScreen", function (value) {
-  if (value == null) {
-    value = true;
-  }
-
+load("fullScreen", true, function (value) {
   fullScreen = value;
 });
-
-load("volume", function (value) {
+load("volume", null, function (value) {
   if (value == null) {
     value = volume;
     save("volume", volume);
@@ -85,24 +60,13 @@ load("volume", function (value) {
 
   updateVolume([null, value]);
 });
-
-load("classroom", function (value) {
-  if (value == null) {
-    value = true;
-  }
-
+load("classroom", true, function (value) {
   classroom = value;
 });
-
-load("gradescope", function (value) {
-  if (value == null) {
-    value = true;
-  }
-
+load("gradescope", true, function (value) {
   gradescope = value;
 });
-
-load("playing", function (value) {
+load("playing", null, function (value) {
   if (value == null) return;
 
   const time = value[0];
@@ -234,11 +198,16 @@ function changeValue(data) {
 
 const submitTexts = ["Submit", "Upload"];
 const classroomText = ["Turn in", "Mark as done"];
+const exceptions = ["Submit file using Canvas Files"];
 function isSubmitButton(element, isButton) {
   if (element.textContent == null || element.id == "submit_quiz_button")
     return false;
 
   const textContent = element.textContent.trim();
+
+  for (const text of exceptions) {
+    if (textContent.includes(text)) return false;
+  }
 
   // Check settings
   for (const text of submitTexts) {
@@ -262,7 +231,7 @@ function clamp(value, min, max) {
 }
 
 function displayBevo(type) {
-  if (!enabled) return;
+  if (!enabled || playing) return;
   if (type == "assignments" && !assignments) return;
   if (type == "quizzes" && !quizzes) return;
   if (type == "other" && !other) return;
@@ -272,10 +241,14 @@ function displayBevo(type) {
   video.src = fullScreen ? fullVideoURL : videoURL;
   video.pause();
 
+  setPlaying(true, type);
+
   setTimeout(() => {
-    setPlaying(true, type);
     videoOverlay.classList.add("show");
     video.play();
+
+    analyticSend("bevo");
+    analyticSend(type);
   }, 100);
 }
 
@@ -309,7 +282,6 @@ function initButton(button, type) {
     });
   }
 
-  console.trace();
   if (debug) console.log(`Initiated ${type}`);
 }
 
@@ -341,12 +313,20 @@ function save(key, value) {
   });
 }
 
-function load(key, callback) {
+function load(key, defaultValue, callback) {
   chrome.storage.local.get([key]).then((result) => {
     value = result[key];
 
+    if (value == null) {
+      value = defaultValue;
+    }
+
     callback(value);
   });
+}
+
+function analyticSend(data) {
+  chrome.runtime.sendMessage(data);
 }
 
 function addSubmit() {
