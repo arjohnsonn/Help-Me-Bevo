@@ -96,6 +96,8 @@ const listenerFuncs = {
 };
 
 document.addEventListener("click", () => {
+  if (!playing) return;
+
   video.muted = false;
 });
 
