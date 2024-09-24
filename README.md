@@ -50,4 +50,8 @@ These instructions are for installing via the ZIP file from the GitHub release <
 ## Credit
 
 Thank you to the YikYak community for originally suggesting this idea!
-The idea originally came from YikYak, and it was upvoted a ton. I needed to work on some side projects, so it was the perfect opportunity to create an extension. Not only build my portfolio but also please the UT students (and of course for the assignment motivation). Hook 'em!
+The idea originally came from YikYak, and it was upvoted a ton. I needed to work on some side projects, so it was the perfect opportunity to create an extension. Not only build my portfolio but also please the UT students (and of course for the assignment motivation).
+
+Credits to the UT media team for the animation.
+
+Hook 'em!
