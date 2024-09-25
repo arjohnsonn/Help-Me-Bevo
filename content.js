@@ -145,7 +145,7 @@ const callback = (mutationList, observer) => {
           if (node.id == "submit-button") {
             initButton(node, "assignments");
           } else {
-            if (isSubmitButton(node, true)) initButton(node, "other");
+            if (isSubmitButton(node, true, "other")) initButton(node, "other");
           }
         } else if (node.nodeType === 1) {
           // nodeType 1 is an Element
@@ -155,14 +155,14 @@ const callback = (mutationList, observer) => {
           buttons.forEach((button) => {
             if (button.id == "submit-button") {
               initButton(button, "assignments");
-            } else if (isSubmitButton(button, true)) {
+            } else if (isSubmitButton(button, true, "other")) {
               initButton(button, "other");
             }
           });
 
           const buttonDivs = document.querySelectorAll('div[role="button"]');
           buttonDivs.forEach((button) => {
-            if (isSubmitButton(button)) {
+            if (isSubmitButton(button, "other")) {
               initButton(button, "other");
             }
           });
@@ -202,7 +202,7 @@ function changeValue(data) {
 const submitTexts = ["Submit", "Upload"];
 const classroomText = ["Turn in", "Mark as done"];
 const exceptions = ["Submit file using Canvas Files"];
-function isSubmitButton(element, isButton) {
+function isSubmitButton(element, isButton, type) {
   if (element.textContent == null || element.id == "submit_quiz_button")
     return false;
 
@@ -214,7 +214,7 @@ function isSubmitButton(element, isButton) {
 
   // Check settings
   for (const text of submitTexts) {
-    if (!gradescope && text == "Upload") continue;
+    if (type != "gradescope" && text == "Upload") continue;
 
     if (textContent.includes(text) && !textContent.includes("Quiz"))
       return true;
