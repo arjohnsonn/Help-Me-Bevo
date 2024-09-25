@@ -22,6 +22,7 @@ Let Bevo take that burden away, and see his infamous 3rd down animation (the OG 
   - Volume
   - Full Screen Mode
 - Random UT Theme Quote
+- Tailwind CSS
 
 ## Link to Extension:
 
