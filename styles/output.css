@@ -554,6 +554,10 @@ video {
   display: none;
 }
 
+.absolute {
+  position: absolute;
+}
+
 .relative {
   position: relative;
 }
@@ -596,6 +600,10 @@ video {
 
 .grid {
   display: grid;
+}
+
+.hidden {
+  display: none;
 }
 
 .size-9 {
@@ -797,6 +805,23 @@ video {
 
 .ease-in-out {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.show {
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.hiddenElm {
+  visibility: hidden;
+  opacity: 0;
+  max-height: 0;
+}
+
+.hidden {
+  display: none;
+  opacity: 0;
+  max-height: 0;
 }
 
 #video-overlay {

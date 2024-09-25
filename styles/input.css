@@ -2,6 +2,39 @@
 @tailwind components;
 @tailwind utilities;
 
+.show {
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.hiddenElm {
+  visibility: hidden;
+  opacity: 0;
+  max-height: 0;
+}
+
+.hidden {
+  display: none;
+  opacity: 0;
+  max-height: 0;
+}
+
+#video-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  visibility: hidden;
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
 #video-overlay {
   position: fixed;
   top: 0;
