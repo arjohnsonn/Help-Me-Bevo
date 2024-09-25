@@ -799,27 +799,6 @@ video {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* * {
-  outline: 1px solid red !important;
-} */
-
-/* .show {
-  visibility: visible !important;
-  opacity: 1 !important;
-}
-
-.hiddenElm {
-  visibility: hidden;
-  opacity: 0;
-  max-height: 0;
-}
-
-.hidden {
-  display: none;
-  opacity: 0;
-  max-height: 0;
-} */
-
 #video-overlay {
   position: fixed;
   top: 0;
@@ -837,12 +816,6 @@ video {
 }
 
 /* Extension */
-
-/* body {
-  width: 20rem;
-  height: 10rem;
-}
-  */
 
 .slider::-webkit-slider-thumb {
   -webkit-appearance: none;

@@ -12,158 +12,162 @@
     />
     <link rel="stylesheet" href="./styles/output.css" />
   </head>
-  <body
-    class="w-[30rem] flex flex-col bg-gradient-to-br from-slate-900 to-slate-950 text-white p-6 rounded-lg relative"
-    style="font-family: 'Poppins', sans-serif"
-  >
-    <div class="flex justify-between">
-      <div class="space-y-1 flex flex-col w-3/4">
-        <h1 class="text-4xl font-black">
-          Help Me <span class="text-[#BF5700]">Bevo!</span>
-        </h1>
-        <p class="opacity-75">
-          Be more motivated to submit assignments with Bevo
-        </p>
-        <br />
+  <body style="font-family: 'Poppins', sans-serif">
+    <main
+      class="w-[30rem] flex flex-col bg-gradient-to-br from-slate-900 to-slate-950 text-white p-6 relative"
+    >
+      <div class="flex justify-between">
+        <div class="space-y-1 flex flex-col w-3/4">
+          <h1 class="text-4xl font-black">
+            Help Me <span class="text-[#BF5700]">Bevo!</span>
+          </h1>
+          <p class="opacity-75">
+            Be more motivated to submit assignments with Bevo
+          </p>
+          <br />
+        </div>
+
+        <!-- Enable/Disable -->
+        <div class="flex items-center justify-center">
+          <button
+            id="toggle"
+            class="vertical-center font-bold rounded-lg size-9 hover:shadow-lg hover:shadow-white/25 shadow-none transition-shadow ease-in-out"
+          >
+            ON
+          </button>
+        </div>
       </div>
 
-      <!-- Enable/Disable -->
-      <div class="flex items-center justify-center">
-        <button
-          id="toggle"
-          class="vertical-center font-bold rounded-lg size-9 hover:shadow-lg hover:shadow-white/25 shadow-none transition-shadow ease-in-out"
+      <div id="content" class="grid grid-cols-2 grid-rows-7 gap-3">
+        <div
+          class="grid grid-rows-4 grid-cols-1 bg-black/40 place-items-center p-4 rounded-lg text-xs row-span-4 col-span-1"
         >
-          ON
-        </button>
-      </div>
-    </div>
+          <div class="size-full flex items-center">
+            <h2 class="text-left font-extrabold text-lg">Canvas</h2>
+          </div>
 
-    <div id="content" class="grid grid-cols-2 grid-rows-7 gap-3">
-      <div
-        class="grid grid-rows-4 grid-cols-1 bg-black/40 place-items-center p-4 rounded-lg text-xs row-span-4 col-span-1"
-      >
-        <div class="size-full flex items-center">
-          <h2 class="text-left font-extrabold text-lg">Canvas</h2>
-        </div>
-
-        <div class="size-full flex items-center">
-          <label class="switch">
-            <input id="assignments" type="checkbox" />
-            <span class="toggleslider round"></span>
-          </label>
-          <h3 class="font-medium">Assignments</h3>
-        </div>
-        <div class="size-full flex items-center">
-          <label class="switch">
-            <input id="quizzes" type="checkbox" />
-            <span class="toggleslider round"></span>
-          </label>
-          <h3 class="font-medium">Quizzes</h3>
-        </div>
-        <div class="size-full flex items-center">
-          <label class="switch">
-            <input id="other" type="checkbox" />
-            <span class="toggleslider round"></span>
-          </label>
-          <h3 class="font-medium">Other "Submit"</h3>
-        </div>
-      </div>
-
-      <div
-        class="grid grid-cols-1 grid-rows-3 text-xs bg-black/40 place-items-center p-4 rounded-lg row-span-3 col-start-2 col-end-2"
-      >
-        <div class="size-full flex items-center">
-          <h2 class="text-left font-extrabold text-lg">Integrations</h2>
-        </div>
-
-        <div class="size-full flex items-center">
-          <label class="switch">
-            <input id="classroom" type="checkbox" />
-            <span class="toggleslider round"></span>
-          </label>
-          <h3 class="font-medium">Google Classroom</h3>
-        </div>
-        <div class="size-full flex items-center">
-          <label class="switch">
-            <input id="gradescope" type="checkbox" />
-            <span class="toggleslider round"></span>
-          </label>
-          <h3 class="font-medium">Gradescope</h3>
-        </div>
-      </div>
-
-      <div
-        class="grid grid-cols-1 grid-rows-3 text-xs bg-black/40 place-items-center p-4 rounded-lg row-span-3 col-start-2 col-end-2"
-      >
-        <div class="size-full flex">
-          <h2 class="text-left font-extrabold text-lg">Display</h2>
-        </div>
-
-        <!-- VOLUME -->
-        <div class="size-full flex flex-col justify-start gap-y-2">
-          <h3 class="w-full font-medium" id="volumeOutput">Volume: 50%</h3>
-          <div class="w-full" id="volumeDiv">
-            <input
-              type="range"
-              min="0"
-              max="100"
-              value="50"
-              class="accent-[#bf5700] w-full bg-[#bf5700]"
-              id="volumeSlider"
-            />
+          <div class="size-full flex items-center">
+            <label class="switch">
+              <input id="assignments" type="checkbox" />
+              <span class="toggleslider round"></span>
+            </label>
+            <h3 class="font-medium">Assignments</h3>
+          </div>
+          <div class="size-full flex items-center">
+            <label class="switch">
+              <input id="quizzes" type="checkbox" />
+              <span class="toggleslider round"></span>
+            </label>
+            <h3 class="font-medium">Quizzes</h3>
+          </div>
+          <div class="size-full flex items-center">
+            <label class="switch">
+              <input id="other" type="checkbox" />
+              <span class="toggleslider round"></span>
+            </label>
+            <h3 class="font-medium">Other "Submit"</h3>
           </div>
         </div>
 
-        <div class="size-full flex items-center">
-          <label class="switch">
-            <input id="fullScreen" type="checkbox" />
-            <span class="toggleslider round"></span>
-          </label>
-          <h3 class="font-medium">Full Screen</h3>
+        <div
+          class="grid grid-cols-1 grid-rows-3 text-xs bg-black/40 place-items-center p-4 rounded-lg row-span-3 col-start-2 col-end-2"
+        >
+          <div class="size-full flex items-center">
+            <h2 class="text-left font-extrabold text-lg">Integrations</h2>
+          </div>
+
+          <div class="size-full flex items-center">
+            <label class="switch">
+              <input id="classroom" type="checkbox" />
+              <span class="toggleslider round"></span>
+            </label>
+            <h3 class="font-medium">Google Classroom</h3>
+          </div>
+          <div class="size-full flex items-center">
+            <label class="switch">
+              <input id="gradescope" type="checkbox" />
+              <span class="toggleslider round"></span>
+            </label>
+            <h3 class="font-medium">Gradescope</h3>
+          </div>
         </div>
-      </div>
 
-      <!-- SOCIALS -->
-      <div
-        class="grid text-xs bg-black/40 place-items-center p-4 rounded-lg row-span-3 col-start-1 col-end-1"
-      >
-        <div class="size-full flex items-center flex-col gap-y-4">
-          <div class="w-full">
-            <div class="font-medium mb-0.5">Made by:</div>
-            <a
-              class="text-[#bf5700] font-medium"
-              href="https://www.instagram.com/aidenn.johnson/"
-              target="_blank"
-              >@aidenn.johnson</a
-            >
+        <div
+          class="grid grid-cols-1 grid-rows-3 text-xs bg-black/40 place-items-center p-4 rounded-lg row-span-3 col-start-2 col-end-2"
+        >
+          <div class="size-full flex">
+            <h2 class="text-left font-extrabold text-lg">Display</h2>
           </div>
 
-          <div class="w-full">
-            <div class="font-medium mb-0.5">Designed by:</div>
-            <a
-              class="text-[#bf5700] font-medium"
-              href="https://www.instagram.com/ethan.lanting/"
-              target="_blank"
-              >@ethan.lanting</a
-            >
+          <!-- VOLUME -->
+          <div class="size-full flex flex-col justify-start gap-y-2">
+            <h3 class="w-full font-medium" id="volumeOutput">Volume: 50%</h3>
+            <div class="w-full" id="volumeDiv">
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value="50"
+                class="accent-[#bf5700] w-full bg-[#bf5700]"
+                id="volumeSlider"
+              />
+            </div>
           </div>
 
-          <div class="w-full">
-            <div class="italics text-xs">
-              DM us for any concerns or suggestions!
+          <div class="size-full flex items-center">
+            <label class="switch">
+              <input id="fullScreen" type="checkbox" />
+              <span class="toggleslider round"></span>
+            </label>
+            <h3 class="font-medium">Full Screen</h3>
+          </div>
+        </div>
+
+        <!-- SOCIALS -->
+        <div
+          class="grid text-xs bg-black/40 place-items-center p-4 rounded-lg row-span-3 col-start-1 col-end-1"
+        >
+          <div class="size-full flex items-center flex-col gap-y-4">
+            <div class="w-full">
+              <div class="font-medium mb-0.5">Made by:</div>
+              <a
+                class="text-[#bf5700] font-medium"
+                href="https://www.instagram.com/aidenn.johnson/"
+                target="_blank"
+                >@aidenn.johnson</a
+              >
+            </div>
+
+            <div class="w-full">
+              <div class="font-medium mb-0.5">Designed by:</div>
+              <a
+                class="text-[#bf5700] font-medium"
+                href="https://www.instagram.com/ethan.lanting/"
+                target="_blank"
+                >@ethan.lanting</a
+              >
+            </div>
+
+            <div class="w-full">
+              <div class="italics text-xs">
+                DM us for any concerns or suggestions!
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div
-        class="flex items-center justify-center text-center text-xs bg-black/40 p-4 rounded-lg"
-      >
-        <div class="text-center font-semibold text-[#bf5700]" id="random-quote">
-          Hook 'Em!
+        <div
+          class="flex items-center justify-center text-center text-xs bg-black/40 p-4 rounded-lg"
+        >
+          <div
+            class="text-center font-semibold text-[#bf5700]"
+            id="random-quote"
+          >
+            Hook 'Em!
+          </div>
         </div>
       </div>
-    </div>
+    </main>
 
     <!-- SCRIPTS -->
     <script src="script.js"></script>
