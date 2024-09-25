@@ -102,7 +102,7 @@ document.addEventListener("click", () => {
 });
 
 video.addEventListener("ended", () => {
-  videoOverlay.classList.remove("show");
+  videoOverlay.classList.remove("show-bevo");
   setPlaying(false);
 
   video.muted = false;
@@ -247,7 +247,7 @@ function displayBevo(type) {
   setPlaying(true, type);
 
   setTimeout(() => {
-    videoOverlay.classList.add("show");
+    videoOverlay.classList.add("show-bevo");
     video.play();
 
     analyticSend("bevo");
