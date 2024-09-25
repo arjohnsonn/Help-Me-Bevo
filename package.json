@@ -1,0 +1,15 @@
+{
+  "name": "help-me-bevo",
+  "version": "1.0.0",
+  "description": "A extension to see the <i>infamous</i> Bevo 3rd down animation when you submit a Canvas assignment!",
+  "main": "content.js",
+  "scripts": {
+    "watch": "npx tailwindcss -i ./styles/input.css -o ./styles/output.css --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "tailwindcss": "^3.4.13"
+  }
+}

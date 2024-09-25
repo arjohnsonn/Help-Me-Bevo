@@ -59,6 +59,7 @@ toggleButton.addEventListener("click", () => {
  */
 
 const settingsDivs = document.querySelectorAll(".settings");
+const contentDiv = document.getElementById("content");
 const assignmentSlider = document.getElementById("assignments");
 const quizzesSlider = document.getElementById("quizzes");
 const otherSlider = document.getElementById("other");
@@ -187,8 +188,8 @@ function clamp(value, min, max) {
 }
 
 function updateToggle() {
-  toggleButton.innerHTML = `<b> Extension: ${enabled ? "ON" : "OFF"}</b>`;
-  toggleButton.style.backgroundColor = enabled ? "#8aff88" : "#ff8888";
+  toggleButton.innerHTML = `${enabled ? "ON" : "OFF"}`;
+  toggleButton.style.backgroundColor = enabled ? "#22c55e" : "#f87171";
 
   settingsDivs.forEach((element) => {
     if (enabled) {
@@ -197,6 +198,8 @@ function updateToggle() {
       element.classList.add("hidden");
     }
   });
+
+  contentDiv.style.opacity = enabled ? 1 : 0.5;
 
   sendMessage(["toggle", enabled]);
 }
