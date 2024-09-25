@@ -281,6 +281,7 @@ function toggle(value) {
 function initButton(button, type) {
   if (button != null) {
     button.addEventListener("click", () => {
+      console.log("click");
       displayBevo(type);
     });
   }

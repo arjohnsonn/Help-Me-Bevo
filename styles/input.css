@@ -18,6 +18,23 @@
   transition: opacity 0.25s ease;
 }
 
+.show {
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.hiddenElm {
+  visibility: hidden;
+  opacity: 0;
+  max-height: 0;
+}
+
+.hidden {
+  display: none;
+  opacity: 0;
+  max-height: 0;
+}
+
 /* Extension */
 
 .slider::-webkit-slider-thumb {

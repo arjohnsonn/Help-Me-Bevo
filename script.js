@@ -58,8 +58,7 @@ toggleButton.addEventListener("click", () => {
  * OTHER SETTINGS
  */
 
-const settingsDivs = document.querySelectorAll(".settings");
-const contentDiv = document.getElementById("content");
+const contentDiv = document.querySelectorAll("#content");
 const assignmentSlider = document.getElementById("assignments");
 const quizzesSlider = document.getElementById("quizzes");
 const otherSlider = document.getElementById("other");
@@ -188,18 +187,13 @@ function clamp(value, min, max) {
 }
 
 function updateToggle() {
-  toggleButton.innerHTML = `${enabled ? "ON" : "OFF"}`;
+  toggleButton.innerHTML = enabled ? "ON" : "OFF";
   toggleButton.style.backgroundColor = enabled ? "#22c55e" : "#f87171";
 
-  settingsDivs.forEach((element) => {
-    if (enabled) {
-      element.classList.remove("hidden");
-    } else {
-      element.classList.add("hidden");
-    }
-  });
-
-  contentDiv.style.opacity = enabled ? 1 : 0.5;
+  for (const element of contentDiv) {
+    element.style.opacity = enabled ? 1 : 0.5;
+    element.style.pointerEvents = enabled ? "auto" : "none";
+  }
 
   sendMessage(["toggle", enabled]);
 }
@@ -222,10 +216,6 @@ function sendMessage(message) {
 function save(key, value) {
   if (key == "volume" && value > 1) {
     value = clamp(value / 100, 0, 1);
-
-    // Debugging
-    console.log(value);
-    console.trace();
   }
 
   chrome.storage.local.set({ [key]: value }).then(() => {

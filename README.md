@@ -54,4 +54,6 @@ The idea originally came from YikYak, and it was upvoted a ton. I needed to work
 
 Credits to the UT media team for the animation.
 
+Thank you @EthanL06 for the design of the extension popup.
+
 Hook 'em!
