@@ -281,7 +281,6 @@ function toggle(value) {
 function initButton(button, type) {
   if (button != null) {
     button.addEventListener("click", () => {
-      console.log("click");
       displayBevo(type);
     });
   }
@@ -314,10 +313,6 @@ function waitForElm(selector) {
 function save(key, value) {
   if (key == "volume" && value > 1) {
     value = clamp(value / 100, 0, 1);
-
-    // Debugging
-    console.log(value);
-    console.trace();
   }
 
   chrome.storage.local.set({ [key]: value }).then(() => {
