@@ -1,19 +1,6 @@
-.show {
-  visibility: visible !important;
-  opacity: 1 !important;
-}
-
-.hiddenElm {
-  visibility: hidden;
-  opacity: 0;
-  max-height: 0;
-}
-
-.hidden {
-  display: none;
-  opacity: 0;
-  max-height: 0;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 #video-overlay {
   position: fixed;
@@ -40,6 +27,8 @@
   height: 24px;
   border: 0;
   cursor: pointer;
+  background-color: #bf5700;
+  accent-color: #bf5700;
 }
 
 .slider::-moz-range-thumb {
@@ -47,12 +36,14 @@
   height: 25px;
   border: 0;
   cursor: pointer;
+  background-color: #bf5700;
+  accent-color: #bf5700;
 }
 
 .centered {
   display: flex;
-  align-items: center;
-  justify-content: center;
+
+  flex-grow: 1;
 }
 
 /* Credits to W3Schools for the open-source switches */
@@ -61,7 +52,7 @@
   display: inline-block;
   width: 40px;
   height: 20px;
-  margin-left: 10px;
+  margin-right: 10px;
 }
 
 /* Hide default HTML checkbox */
@@ -97,11 +88,11 @@
 }
 
 input:checked + .toggleslider {
-  background-color: #2196f3;
+  background-color: #bf5700;
 }
 
 input:focus + .toggleslider {
-  box-shadow: 0 0 1px #2196f3;
+  box-shadow: 0 0 1px #bf5700;
 }
 
 input:checked + .toggleslider:before {
