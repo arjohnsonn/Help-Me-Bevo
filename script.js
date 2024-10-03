@@ -61,6 +61,7 @@ toggleButton.addEventListener("click", () => {
 const contentDiv = document.querySelectorAll("#content");
 const assignmentSlider = document.getElementById("assignments");
 const quizzesSlider = document.getElementById("quizzes");
+const discussionsSlider = document.getElementById("discussions");
 const otherSlider = document.getElementById("other");
 const fullScreenSlider = document.getElementById("fullScreen");
 const classroomSlider = document.getElementById("classroom");
@@ -69,6 +70,7 @@ const gradescopeSlider = document.getElementById("gradescope");
 const sliderSaveKeys = {
   [assignmentSlider]: "assignments",
   [quizzesSlider]: "quizzes",
+  [discussionsSlider]: "discussions",
   [otherSlider]: "other",
   [fullScreenSlider]: "fullScreen",
   [classroomSlider]: "classroom",
@@ -78,6 +80,7 @@ const sliderSaveKeys = {
 const sliders = [
   assignmentSlider,
   quizzesSlider,
+  discussionsSlider,
   otherSlider,
   fullScreenSlider,
   classroomSlider,
@@ -113,6 +116,16 @@ load("quizzes", function (value) {
   }
 
   updateSlider(quizzesSlider, value);
+});
+
+load("discussions", function (value) {
+  if (value == null) {
+    value = true;
+
+    save("discussions", true);
+  }
+
+  updateSlider(discussionsSlider, value);
 });
 
 load("other", function (value) {
@@ -159,17 +172,47 @@ load("gradescope", function (value) {
  */
 
 const quote = document.getElementById("random-quote");
-const quotes = [
-  "Hook 'Em!",
-  "UT > A&M",
-  "OU still sucks btw",
-  "can we please pet bevo",
-  "natty bounddd",
-  "what is an aggie?😭",
-  "fix the big ticket system pls",
-];
+const staticUrl = "https://aidenjohnson.dev/Hosts/help-me-bevo-quotes.json";
+fetch(staticUrl)
+  .then((response) => {
+    if (!response.ok) {
+      throw new Error("Network response was not ok " + response.statusText);
+    }
+    return response.json();
+  })
+  .then((data) => {
+    const quotes = data.quotes;
+    quote.textContent = quotes[Math.floor(Math.random() * quotes.length)];
+  })
+  .catch((error) => {
+    console.error("There was a problem with the fetch operation:", error);
+  });
 
-quote.textContent = quotes[Math.floor(Math.random() * quotes.length)];
+/**
+ * EXTENSIONS
+ */
+
+const extensionButton = document.getElementById("extensionbutton");
+const extensionMain = document.getElementById("extensions");
+const extensionDiv = document.getElementById("extensionsdiv");
+const extensionBack = document.getElementById("extensionback");
+const main = document.getElementById("main");
+
+extensionButton.addEventListener("click", () => {
+  main.classList.add("animate-in");
+  main.classList.remove("animate-out");
+  extensionMain.classList.remove("animate-out");
+  extensionMain.classList.add("animate-in");
+  extensionDiv.classList.remove("pointer-events-none");
+});
+
+extensionBack.addEventListener("click", () => {
+  main.classList.add("animate-out");
+  main.classList.remove("animate-in");
+  extensionMain.classList.remove("animate-in");
+  extensionMain.classList.add("animate-out");
+  extensionDiv.classList.add("pointer-events-none");
+});
 
 /**
  * FUNCTIONS

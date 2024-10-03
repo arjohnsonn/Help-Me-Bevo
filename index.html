@@ -11,10 +11,10 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./styles/output.css" />
-    <link rel="stylesheet" href="./styles/styles.css" />
   </head>
-  <body style="font-family: 'Poppins', sans-serif">
+  <body style="font-family: 'Poppins', sans-serif; background-color: black">
     <main
+      id="main"
       class="w-[30rem] flex flex-col bg-gradient-to-br from-slate-900 to-slate-950 text-white p-6 relative"
     >
       <div class="flex justify-between">
@@ -39,15 +39,14 @@
         </div>
       </div>
 
-      <div class="grid grid-cols-2 grid-rows-7 gap-3">
+      <div class="grid grid-cols-2 grid-rows-6 gap-3">
         <div
           id="content"
-          class="grid grid-rows-4 grid-cols-1 bg-black/40 place-items-center p-4 rounded-lg text-xs row-span-4 col-span-1"
+          class="grid grid-rows-5 grid-cols-1 bg-black/40 place-items-center p-4 rounded-lg text-xs row-span-3 col-span-1"
         >
           <div class="size-full flex items-center">
             <h2 class="text-left font-extrabold text-lg">Canvas</h2>
           </div>
-
           <div class="size-full flex items-center">
             <label class="switch">
               <input id="assignments" type="checkbox" />
@@ -64,6 +63,13 @@
           </div>
           <div class="size-full flex items-center">
             <label class="switch">
+              <input id="discussions" type="checkbox" />
+              <span class="toggleslider round"></span>
+            </label>
+            <h3 class="font-medium">Discussions</h3>
+          </div>
+          <div class="size-full flex items-center">
+            <label class="switch">
               <input id="other" type="checkbox" />
               <span class="toggleslider round"></span>
             </label>
@@ -73,7 +79,7 @@
 
         <div
           id="content"
-          class="grid grid-cols-1 grid-rows-3 text-xs bg-black/40 place-items-center p-4 rounded-lg row-span-3 col-start-2 col-end-2"
+          class="grid grid-cols-1 grid-rows-3 text-xs bg-black/40 place-items-center p-4 rounded-lg row-span-2 col-start-2 col-end-2"
         >
           <div class="size-full flex items-center">
             <h2 class="text-left font-extrabold text-lg">Integrations</h2>
@@ -157,6 +163,13 @@
                 DM us for any concerns or suggestions!
               </div>
             </div>
+
+            <button
+              id="extensionbutton"
+              class="font-bold px-2 py-1.5 bg-[#bf5700] rounded-full hover:shadow-lg hover:shadow-white/25 shadow-none transition-shadow ease-in-out"
+            >
+              More Extensions
+            </button>
           </div>
         </div>
 
@@ -172,6 +185,78 @@
         </div>
       </div>
     </main>
+
+    <div
+      class="pointer-events-none absolute"
+      id="extensionsdiv"
+      style="top: 50%; left: 50%; transform: translate(-50%, -50%)"
+    >
+      <main
+        style="z-index: 3"
+        id="extensions"
+        class="w-[30rem] animate-out bg-gradient-to-br from-slate-900 to-slate-950 text-white p-6 items-center justify-center"
+      >
+        <div class="flex justify-between">
+          <div class="space-y-1 flex flex-col w-3/4">
+            <h1 class="text-4xl font-black">
+              More <span class="text-[#BF5700]">Extensions</span>
+            </h1>
+            <p class="opacity-75">Check out my other extensions!</p>
+            <br />
+          </div>
+        </div>
+
+        <div
+          class="bg-black/40 place-items-center p-4 rounded-lg text-xs row-span-4 col-span-1"
+        >
+          <div class="size-full flex items-center">
+            <h2 class="text-left font-extrabold text-lg">Pet Bevo</h2>
+          </div>
+          <p class="opacity-75 text-left">
+            Let Bevo roam & jump around any website of your choice!
+          </p>
+          <br />
+          <button
+            class="px-2 py-1.5 bg-[rgb(203,115,43)] bg-opacity-0.25 rounded-full hover:shadow-lg hover:shadow-white/25 shadow-none transition-shadow ease-in-out"
+          >
+            COMING SOON
+          </button>
+        </div>
+        <br />
+        <div
+          class="bg-black/40 place-items-center p-4 rounded-lg text-xs row-span-4 col-span-1"
+        >
+          <div class="size-full flex items-center">
+            <h2 class="text-left font-extrabold text-lg">
+              Canvas Strikethrough
+            </h2>
+          </div>
+          <p class="opacity-75 text-left">
+            Adds a strikethrough option on answers on Canvas quizzes
+          </p>
+
+          <br />
+          <a
+            href="https://chromewebstore.google.com/detail/canvas-quiz-strikethrough/fcjcfgejljnocnojlhemagncjnofdjnj"
+            target="_blank"
+          >
+            <button
+              class="px-2 py-1.5 bg-[#4287f5] bg-opacity-0.25 rounded-full hover:shadow-lg hover:shadow-white/25 shadow-none transition-shadow ease-in-out"
+            >
+              Store Link
+            </button>
+          </a>
+        </div>
+
+        <br />
+        <button
+          id="extensionback"
+          class="px-2 py-1.5 bg-[#bf5700] rounded-full hover:shadow-lg hover:shadow-white/25 shadow-none transition-shadow ease-in-out"
+        >
+          Back
+        </button>
+      </main>
+    </div>
 
     <!-- SCRIPTS -->
     <script src="script.js"></script>

@@ -25,6 +25,7 @@ const video = document.getElementById("video");
 var enabled = true;
 var assignments = true;
 var quizzes = false;
+var discussions = true;
 var other = true;
 var fullScreen = true;
 var classroom = true;
@@ -43,6 +44,9 @@ load("assignments", true, function (value) {
 });
 load("quizzes", false, function (value) {
   quizzes = value;
+});
+load("discussions", false, function (value) {
+  discussions = value;
 });
 load("other", true, function (value) {
   other = value;
@@ -133,6 +137,9 @@ waitForElm("#submit_quiz_button").then((elm) => {
   initButton(elm, "quizzes");
 });
 
+// Discussions
+// ?
+
 // Dynamically loaded Submit buttons
 const bodyElement = document.body;
 const config = { childList: true, subtree: true };
@@ -157,6 +164,12 @@ const callback = (mutationList, observer) => {
               initButton(button, "assignments");
             } else if (isSubmitButton(button, true, "other")) {
               initButton(button, "other");
+            } else if (
+              button.parentElement.classList.contains(
+                "discussions-editor-submit"
+              )
+            ) {
+              initButton(button, "discussions");
             }
           });
 
@@ -188,6 +201,8 @@ function changeValue(data) {
       assignments = value;
     case "quizzes":
       quizzes = value;
+    case "discussions":
+      discussions = value;
     case "other":
       other = value;
     case "fullScreen":
@@ -237,6 +252,7 @@ function displayBevo(type) {
   if (!enabled || playing) return;
   if (type == "assignments" && !assignments) return;
   if (type == "quizzes" && !quizzes) return;
+  if (type == "discussions" && !discussions) return;
   if (type == "other" && !other) return;
 
   video.style.width = fullScreen ? "100%" : "90%";
