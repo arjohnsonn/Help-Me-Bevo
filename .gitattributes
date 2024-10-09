@@ -1,0 +1,3 @@
+# Ignore the CSS files in the "styles" folder to reduce their impact on language statistics
+styles/output.css linguist-vendored
+styles/input.css linguist-vendored
