@@ -164,6 +164,8 @@ const callback = (mutationList, observer) => {
               initButton(button, "assignments");
             } else if (isSubmitButton(button, true, "other")) {
               initButton(button, "other");
+            } else if (isSubmitButton(button, true, "gradescope")) {
+              initButton(button, "gradescope"); 
             } else if (
               button.parentElement.classList.contains(
                 "discussions-editor-submit"
