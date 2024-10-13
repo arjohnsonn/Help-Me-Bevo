@@ -18,6 +18,16 @@
   transition: opacity 0.25s ease;
 }
 
+.skip-button {
+  position: absolute; 
+  bottom: 10px; 
+  right: 20px;
+  font-weight: bold;
+  border-radius: 8px;
+  padding: 5px 10px;
+  border: none;
+}
+
 #extensions {
   transition: opacity 0.75s ease;
 }

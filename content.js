@@ -11,6 +11,9 @@ const overlayHTML = `
       <source src="${videoURL}" type="video/mp4">
       Your browser does not support the video tag.
     </video>
+      <button class="skip-button" id="skip-button">
+      SKIP
+      </button>
   </div>
 `;
 
@@ -21,6 +24,7 @@ document.body.appendChild(overlayElement);
 const videoDiv = document.getElementById("volumeDiv");
 const videoOverlay = document.getElementById("video-overlay");
 const video = document.getElementById("video");
+const skip = document.getElementById("skip-button");
 
 var enabled = true;
 var assignments = true;
@@ -122,6 +126,13 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     console.log(request);
   }
 });
+
+skip.addEventListener("click", () => {
+  video.pause()
+  video.currentTime = 0;
+  videoOverlay.classList.remove("show-bevo");
+  setPlaying(false);
+})
 
 /**
  * ATTACHING TO BUTTONS
