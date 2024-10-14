@@ -27,6 +27,16 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   });
 });
 
+let internalUrl = chrome.runtime.getURL("html/landing.html");
+chrome.runtime.onInstalled.addListener(function (object) {
+  console.log(object.reason);
+  if (object.reason === chrome.runtime.OnInstalledReason.INSTALL) {
+    chrome.tabs.create({ url: internalUrl }, function (tab) {
+      console.log("Installation detected");
+    });
+  }
+});
+
 async function getOrCreateClientId() {
   const result = await chrome.storage.local.get("clientId");
   let clientId = result.clientId;

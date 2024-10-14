@@ -18,9 +18,20 @@
   transition: opacity 0.25s ease;
 }
 
+.menu-frame {
+  border: none;
+  height: 150vh;
+  flex: 1;
+  max-width: 514px;
+  max-height: 700px;
+  overflow: scroll;
+  border: 1px solid #323232;
+  border-radius: 8px;
+}
+
 .skip-button {
-  position: absolute; 
-  bottom: 10px; 
+  position: absolute;
+  bottom: 10px;
   right: 20px;
   font-weight: bold;
   border-radius: 8px;
