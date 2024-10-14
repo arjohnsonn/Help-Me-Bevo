@@ -4,7 +4,7 @@ const GA_ENDPOINT = "https://www.google-analytics.com/mp/collect";
 const DEFAULT_ENGAGEMENT_TIME_IN_MSEC = 6000;
 const SESSION_EXPIRATION_IN_MIN = 5;
 
-chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
+async function send(request) {
   fetch(
     `${GA_ENDPOINT}?measurement_id=${MEASUREMENT_ID}&api_secret=${API_SECRET}`,
     {
@@ -25,11 +25,16 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   ).then((response) => {
     console.log(request + " " + response.ok);
   });
+}
+
+chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
+  send(request);
 });
 
 let internalUrl = chrome.runtime.getURL("html/landing.html");
 chrome.runtime.onInstalled.addListener(function (object) {
   console.log(object.reason);
+  send("testinstall");
   if (object.reason === chrome.runtime.OnInstalledReason.INSTALL) {
     chrome.tabs.create({ url: internalUrl }, function (tab) {
       console.log("Installation detected");
