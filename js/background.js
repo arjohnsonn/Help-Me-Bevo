@@ -34,8 +34,8 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
 let internalUrl = chrome.runtime.getURL("html/landing.html");
 chrome.runtime.onInstalled.addListener(function (object) {
   console.log(object.reason);
-  send("testinstall");
   if (object.reason === chrome.runtime.OnInstalledReason.INSTALL) {
+    send("install");
     chrome.tabs.create({ url: internalUrl }, function (tab) {
       console.log("Installation detected");
     });
