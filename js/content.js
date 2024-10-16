@@ -280,21 +280,18 @@ async function displayBevo(type) {
 
   video.style.width = fullScreen ? "100%" : "90%";
 
-  var URL = themedVideoURL;
+  var URL = fullScreen ? fullVideoURL : videoURL;
   if (!themedAnims) {
     URL = fullScreen ? fullVideoURL : videoURL;
   } else {
-    const isValid = await isValidVideo(URL);
+    const isValid = await isValidVideo(themedVideoURL);
 
-    if (!isValid) {
-      URL = fullScreen ? fullVideoURL : videoURL;
-      console.log(URL);
+    if (isValid) {
+      URL = themedVideoURL;
     }
 
     console.log("Video is " + (isValid ? "valid" : "invalid"));
   }
-
-  console.log(URL);
 
   video.src = URL;
   video.pause();
