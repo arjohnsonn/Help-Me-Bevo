@@ -1,5 +1,7 @@
 const videoURL = "https://aidenjohnson.dev/Images/Bevo.mp4";
 const fullVideoURL = "https://aidenjohnson.dev/Images/BevoCrop.mp4";
+const themedVideoURL = "https://aidenjohnson.dev/Images/ThemedBevo.mp4";
+
 const name = "Help Me Bevo"; // Name of Extension
 const debug = false;
 var volume = 0.5;
@@ -26,15 +28,18 @@ const videoOverlay = document.getElementById("video-overlay");
 const video = document.getElementById("video");
 const skip = document.getElementById("skip-button");
 
-var enabled = true;
-var assignments = true;
-var quizzes = false;
-var discussions = true;
-var other = true;
-var fullScreen = true;
-var classroom = true;
-var gradescope = true;
-var playing = false;
+var OPTIONS = [
+  (enabled = true),
+  (assignments = true),
+  (quizzes = false),
+  (discussions = true),
+  (other = true),
+  (fullScreen = true),
+  (classroom = true),
+  (gradescope = true),
+  (playing = false),
+  (themedAnims = false),
+];
 
 /**
  * LOAD SETTINGS
@@ -89,6 +94,9 @@ load("playing", null, function (value) {
     save("playing", null);
   }
 });
+load("themedAnims", true, function (value) {
+  themedAnims = value;
+});
 
 /**
  * EVENTS & LISTENERS
@@ -128,11 +136,11 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 });
 
 skip.addEventListener("click", () => {
-  video.pause()
+  video.pause();
   video.currentTime = 0;
   videoOverlay.classList.remove("show-bevo");
   setPlaying(false);
-})
+});
 
 /**
  * ATTACHING TO BUTTONS
@@ -176,7 +184,7 @@ const callback = (mutationList, observer) => {
             } else if (isSubmitButton(button, true, "other")) {
               initButton(button, "other");
             } else if (isSubmitButton(button, true, "gradescope")) {
-              initButton(button, "gradescope"); 
+              initButton(button, "gradescope");
             } else if (
               button.parentElement.classList.contains(
                 "discussions-editor-submit"
@@ -224,6 +232,8 @@ function changeValue(data) {
       classroom = value;
     case "gradescope":
       gradescope = value;
+    case "themedAnims":
+      themedAnims = value;
   }
 }
 
@@ -261,7 +271,7 @@ function clamp(value, min, max) {
   return Math.max(min, Math.min(value, max));
 }
 
-function displayBevo(type) {
+async function displayBevo(type) {
   if (!enabled || playing) return;
   if (type == "assignments" && !assignments) return;
   if (type == "quizzes" && !quizzes) return;
@@ -270,7 +280,23 @@ function displayBevo(type) {
 
   video.style.width = fullScreen ? "100%" : "90%";
 
-  video.src = fullScreen ? fullVideoURL : videoURL;
+  var URL = themedVideoURL;
+  if (!themedAnims) {
+    URL = fullScreen ? fullVideoURL : videoURL;
+  } else {
+    const isValid = await isValidVideo(URL);
+
+    if (!isValid) {
+      URL = fullScreen ? fullVideoURL : videoURL;
+      console.log(URL);
+    }
+
+    console.log("Video is " + (isValid ? "valid" : "invalid"));
+  }
+
+  console.log(URL);
+
+  video.src = URL;
   video.pause();
 
   setPlaying(true, type);
@@ -306,6 +332,37 @@ function toggle(value) {
 
   enabled = value;
 }
+
+function isValidVideo(url) {
+  // First, check if the URL ends with .mp4
+  if (!url.toLowerCase().endsWith(".mp4")) {
+    return false;
+  }
+
+  // Create a video element to check if the video can be loaded
+  const video = document.createElement("video");
+  video.src = url;
+
+  return new Promise((resolve) => {
+    // Add an event listener for video load success
+    video.onloadeddata = () => {
+      resolve(true); // Valid video
+    };
+
+    // Add an event listener for video load failure
+    video.onerror = () => {
+      resolve(false); // Invalid video
+    };
+  });
+}
+
+isValidVideo(videoUrl).then((isValid) => {
+  if (isValid) {
+    console.log("The video is valid.");
+  } else {
+    console.log("The video is not valid.");
+  }
+});
 
 function initButton(button, type) {
   if (button != null) {

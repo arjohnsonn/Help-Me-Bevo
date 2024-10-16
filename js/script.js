@@ -66,6 +66,7 @@ const otherSlider = document.getElementById("other");
 const fullScreenSlider = document.getElementById("fullScreen");
 const classroomSlider = document.getElementById("classroom");
 const gradescopeSlider = document.getElementById("gradescope");
+const themedSlider = document.getElementById("themedAnims");
 
 const sliderSaveKeys = {
   [assignmentSlider]: "assignments",
@@ -75,6 +76,7 @@ const sliderSaveKeys = {
   [fullScreenSlider]: "fullScreen",
   [classroomSlider]: "classroom",
   [gradescopeSlider]: "gradescope",
+  [themedSlider]: "themedAnims",
 };
 
 const sliders = [
@@ -85,6 +87,7 @@ const sliders = [
   fullScreenSlider,
   classroomSlider,
   gradescopeSlider,
+  themedSlider,
 ];
 
 sliders.forEach((settingSlider) => {
@@ -166,6 +169,16 @@ load("gradescope", function (value) {
   }
 
   updateSlider(gradescopeSlider, value);
+});
+
+load("themedAnims", function (value) {
+  if (value == null) {
+    value = true;
+
+    save("themedAnims", true);
+  }
+
+  updateSlider(themedSlider, value);
 });
 /**
  * OTHER
