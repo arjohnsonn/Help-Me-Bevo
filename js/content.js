@@ -28,18 +28,16 @@ const videoOverlay = document.getElementById("video-overlay");
 const video = document.getElementById("video");
 const skip = document.getElementById("skip-button");
 
-var OPTIONS = [
-  (enabled = true),
-  (assignments = true),
-  (quizzes = false),
-  (discussions = true),
-  (other = true),
-  (fullScreen = true),
-  (classroom = true),
-  (gradescope = true),
-  (playing = false),
-  (themedAnims = false),
-];
+var enabled = true;
+var assignments = true;
+var quizzes = false;
+var discussions = true;
+var other = true;
+var fullScreen = true;
+var classroom = true;
+var gradescope = true;
+var playing = false;
+var themedAnims = true;
 
 /**
  * LOAD SETTINGS
@@ -220,20 +218,28 @@ function changeValue(data) {
   switch (variable) {
     case "assignments":
       assignments = value;
+      break;
     case "quizzes":
       quizzes = value;
+      break;
     case "discussions":
       discussions = value;
+      break;
     case "other":
       other = value;
+      break;
     case "fullScreen":
       fullScreen = value;
+      break;
     case "classroom":
       classroom = value;
+      break;
     case "gradescope":
       gradescope = value;
+      break;
     case "themedAnims":
       themedAnims = value;
+      break;
   }
 }
 
@@ -352,14 +358,6 @@ function isValidVideo(url) {
     };
   });
 }
-
-isValidVideo(videoUrl).then((isValid) => {
-  if (isValid) {
-    console.log("The video is valid.");
-  } else {
-    console.log("The video is not valid.");
-  }
-});
 
 function initButton(button, type) {
   if (button != null) {
