@@ -89,7 +89,7 @@ load("playing", null, function (value) {
 
   if (wasPlaying && Date.now() / 1000 - time < 4) {
     video.muted = true;
-    displayBevo(type);
+    displayBevo(type, true);
   } else if (wasPlaying) {
     save("playing", null);
   }
@@ -279,7 +279,7 @@ function clamp(value, min, max) {
   return Math.max(min, Math.min(value, max));
 }
 
-async function displayBevo(type) {
+async function displayBevo(type, skipAnalytics) {
   if (!enabled || playing) return;
   if (type == "assignments" && !assignments) return;
   if (type == "quizzes" && !quizzes) return;
@@ -310,8 +310,10 @@ async function displayBevo(type) {
     videoOverlay.classList.add("show-bevo");
     video.play();
 
-    analyticSend("bevo");
-    analyticSend(type);
+    if (!skipAnalytics) {
+      analyticSend("bevo");
+      analyticSend(type);
+    }
   }, 100);
 }
 
