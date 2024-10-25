@@ -28,6 +28,8 @@ const videoOverlay = document.getElementById("video-overlay");
 const video = document.getElementById("video");
 const skip = document.getElementById("skip-button");
 
+var eventButtons = [];
+
 var enabled = true;
 var assignments = true;
 var quizzes = false;
@@ -360,7 +362,8 @@ function isValidVideo(url) {
 }
 
 function initButton(button, type) {
-  if (button != null) {
+  if (button != null && !eventButtons.includes(button)) {
+    eventButtons.push(button);
     button.addEventListener("click", () => {
       displayBevo(type);
     });
