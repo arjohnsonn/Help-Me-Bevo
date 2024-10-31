@@ -183,7 +183,10 @@ const callback = (mutationList, observer) => {
               initButton(button, "assignments");
             } else if (isSubmitButton(button, true, "other")) {
               initButton(button, "other");
-            } else if (isSubmitButton(button, true, "gradescope")) {
+            } else if (
+              isSubmitButton(button, true, "gradescope") &&
+              window.location.href.includes("gradescope")
+            ) {
               initButton(button, "gradescope");
             } else if (
               button.parentElement.classList.contains(
@@ -285,6 +288,8 @@ async function displayBevo(type, skipAnalytics) {
   if (type == "quizzes" && !quizzes) return;
   if (type == "discussions" && !discussions) return;
   if (type == "other" && !other) return;
+
+  console.log(type);
 
   video.style.width = fullScreen ? "100%" : "90%";
 
