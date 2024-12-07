@@ -19,14 +19,42 @@ const overlayHTML = `
   </div>
 `;
 
-const overlayElement = document.createElement("div");
-overlayElement.innerHTML = overlayHTML;
-document.body.appendChild(overlayElement);
+let videoDiv;
+let videoOverlay;
+let video;
+let skip;
 
-const videoDiv = document.getElementById("volumeDiv");
-const videoOverlay = document.getElementById("video-overlay");
-const video = document.getElementById("video");
-const skip = document.getElementById("skip-button");
+let injected = false;
+function injectVideo() {
+  if (injected) return;
+
+  const overlayElement = document.createElement("div");
+  overlayElement.innerHTML = overlayHTML;
+  document.body.appendChild(overlayElement);
+
+  videoDiv = document.getElementById("volumeDiv");
+  videoOverlay = document.getElementById("video-overlay");
+  video = document.getElementById("video");
+  skip = document.getElementById("skip-button");
+
+  video.addEventListener("ended", () => {
+    videoOverlay.classList.remove("show-bevo");
+    setPlaying(false);
+
+    video.muted = false;
+  });
+
+  skip.addEventListener("click", () => {
+    video.pause();
+    video.currentTime = 0;
+    videoOverlay.classList.remove("show-bevo");
+    setPlaying(false);
+  });
+
+  injected = true;
+
+  console.log("Injected video");
+}
 
 var eventButtons = [];
 
@@ -88,6 +116,7 @@ load("playing", null, function (value) {
   const type = value[2];
 
   if (wasPlaying && Date.now() / 1000 - time < 4) {
+    injectVideo();
     video.muted = true;
     displayBevo(type, true);
   } else if (wasPlaying) {
@@ -117,13 +146,6 @@ document.addEventListener("click", () => {
   video.muted = false;
 });
 
-video.addEventListener("ended", () => {
-  videoOverlay.classList.remove("show-bevo");
-  setPlaying(false);
-
-  video.muted = false;
-});
-
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request == null) return;
 
@@ -133,13 +155,6 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   } else {
     console.log(request);
   }
-});
-
-skip.addEventListener("click", () => {
-  video.pause();
-  video.currentTime = 0;
-  videoOverlay.classList.remove("show-bevo");
-  setPlaying(false);
 });
 
 /**
@@ -303,7 +318,7 @@ async function displayBevo(type, skipAnalytics) {
       URL = themedVideoURL;
     }
 
-    console.log("Video is " + (isValid ? "valid" : "invalid"));
+    console.log("Themed video " + (isValid ? "exists" : "doesn't exist"));
   }
 
   video.src = URL;
@@ -336,7 +351,7 @@ function updateVolume(value) {
   value = value[1];
   volume = clamp(value, 0, 1);
 
-  video.volume = volume;
+  if (video != null) video.volume = volume;
 }
 
 function toggle(value) {
@@ -370,6 +385,8 @@ function isValidVideo(url) {
 
 function initButton(button, type) {
   if (button != null && !eventButtons.includes(button)) {
+    injectVideo();
+
     eventButtons.push(button);
     button.addEventListener("click", () => {
       displayBevo(type);
