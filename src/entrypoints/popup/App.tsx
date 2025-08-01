@@ -4,15 +4,16 @@ import Left from "@/assets/animations/bevo-wigwag/Left.png";
 import Middle from "@/assets/animations/bevo-wigwag/Middle.png";
 import Right from "@/assets/animations/bevo-wigwag/Right.png";
 import { SliderSetting, ToggleSetting } from "@/components/Setting";
+import { Button } from "@/components/ui/button";
 
 function App() {
   const bevoFrames = [Middle, Left, Middle, Right];
 
   return (
-    <div className="h-[28rem] w-96 bg-[#101010]">
+    <div className="h-87 w-96 bg-neutral-900">
       <Aurora
         colorStops={["#BF5700", "#5B2F0B", "#5E3F1C"]}
-        blend={0.5}
+        blend={1}
         amplitude={0.5}
         speed={0.5}
       />
@@ -45,6 +46,21 @@ function App() {
               <ToggleSetting name="Quizzes" />
               <ToggleSetting name="Discussions" />
               <ToggleSetting name="Other" />
+            </div>
+
+            <div className="w-full rounded-lg bg-black/30 px-3 py-2">
+              <p className="text-md text-center font-medium text-white">
+                Hook 'em
+              </p>
+            </div>
+
+            <div className="flex w-full flex-row gap-2">
+              <Button className="h-7 flex-1 bg-[#bf5700] font-bold">
+                Credits
+              </Button>
+              <Button className="h-7 flex-1 bg-[#bf5700] font-bold">
+                Stats
+              </Button>
             </div>
           </div>
           <div className="flex flex-col gap-2">
