@@ -39,10 +39,14 @@ export default function MovingAnimatedImage({
   const [direction, setDirection] = useState<"left" | "right">("right");
   const [isMoving, setIsMoving] = useState(true);
   const [isIdle, setIsIdle] = useState(false);
+  const [manualControl, setManualControl] = useState(false);
 
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const movementRef = useRef<NodeJS.Timeout | null>(null);
   const idleRef = useRef<NodeJS.Timeout | null>(null);
+  const manualMovementRef = useRef<NodeJS.Timeout | null>(null);
+  const manualTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const keysPressed = useRef<Set<string>>(new Set());
   const preloadedImages = useRef<HTMLImageElement[]>([]);
 
   const imageWidth = 84;
@@ -96,11 +100,11 @@ export default function MovingAnimatedImage({
         clearInterval(intervalRef.current);
       }
     };
-  }, [images, idleImages, interval, idleInterval, isLoaded, isMoving, isIdle]);
+  }, [images, idleImages, interval, idleInterval, isLoaded, isMoving, isIdle, manualControl]);
 
   // Movement logic effect
   useEffect(() => {
-    if (!isLoaded) return;
+    if (!isLoaded || manualControl) return;
 
     const moveAnimal = () => {
       if (isIdle) return;
@@ -153,13 +157,101 @@ export default function MovingAnimatedImage({
         clearInterval(movementRef.current);
       }
     };
-  }, [isLoaded, isMoving, isIdle, direction, containerWidth, imageWidth, speed, stopChance, idleTimeMin, idleTimeMax, directionChangeChance, movementTickRate]);
+  }, [isLoaded, isMoving, isIdle, direction, containerWidth, imageWidth, speed, stopChance, idleTimeMin, idleTimeMax, directionChangeChance, movementTickRate, manualControl]);
+
+  // Keyboard controls
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      switch (event.key) {
+        case 'ArrowLeft':
+          event.preventDefault();
+          if (!keysPressed.current.has('ArrowLeft')) {
+            keysPressed.current.add('ArrowLeft');
+            startManualMovement('left');
+          }
+          break;
+        case 'ArrowRight':
+          event.preventDefault();
+          if (!keysPressed.current.has('ArrowRight')) {
+            keysPressed.current.add('ArrowRight');
+            startManualMovement('right');
+          }
+          break;
+      }
+    };
+
+    const handleKeyUp = (event: KeyboardEvent) => {
+      if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+        keysPressed.current.delete(event.key);
+        stopManualMovement();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+    
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, []);
+
+  const startManualMovement = (newDirection: 'left' | 'right') => {
+    // Clear existing timeouts
+    if (manualTimeoutRef.current) {
+      clearTimeout(manualTimeoutRef.current);
+    }
+    if (manualMovementRef.current) {
+      clearInterval(manualMovementRef.current);
+    }
+
+    setManualControl(true);
+    setDirection(newDirection);
+    setIsMoving(true);
+    setIsIdle(false);
+
+    // Start continuous movement
+    manualMovementRef.current = setInterval(() => {
+      setPosition(prevPos => {
+        const moveDistance = 4; // 4px per tick
+        let newPos = newDirection === 'right' ? prevPos + moveDistance : prevPos - moveDistance;
+        newPos = Math.max(0, Math.min(containerWidth - imageWidth, newPos));
+        return newPos;
+      });
+    }, 30); // 30ms intervals for smooth movement
+  };
+
+  const stopManualMovement = () => {
+    if (manualMovementRef.current) {
+      clearInterval(manualMovementRef.current);
+      manualMovementRef.current = null;
+    }
+
+    // Go to idle immediately when stopping manual movement
+    setIsMoving(false);
+    setIsIdle(true);
+    setCurrentIndex(0); // Reset to first frame of idle animation
+
+    // Wait 2 seconds before returning to auto movement
+    manualTimeoutRef.current = setTimeout(() => {
+      setManualControl(false);
+      setIsMoving(true);
+      setIsIdle(false);
+    }, 2000);
+  };
+
 
   // Cleanup timeouts
   useEffect(() => {
     return () => {
       if (idleRef.current) {
         clearTimeout(idleRef.current);
+      }
+      if (manualTimeoutRef.current) {
+        clearTimeout(manualTimeoutRef.current);
+      }
+      if (manualMovementRef.current) {
+        clearInterval(manualMovementRef.current);
       }
     };
   }, []);
@@ -180,7 +272,7 @@ export default function MovingAnimatedImage({
         bottom: "8px",
         left: `${position}px`,
         transform: direction === "left" ? "scaleX(-1)" : "scaleX(1)",
-        transition: "left 0.05s linear",
+        transition: manualControl ? "none" : "left 0.05s linear",
         zIndex: 10,
       }}
     />

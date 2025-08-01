@@ -23,14 +23,14 @@ interface SliderSettingProps extends SettingProps {
 const ToggleSetting = (props: ToggleSettingProps) => {
   return (
     <div className="flex w-full flex-row items-center justify-between">
-      <p className="text-left font-bold text-white">
+      <span className="text-left font-bold text-white">
         {props.name}{" "}
         {props.tooltip && (
           <Tooltip content={props.tooltip}>
             <span className="ml-0.5 cursor-help">&#9432;</span>
           </Tooltip>
         )}
-      </p>
+      </span>
       <Switch />
     </div>
   );
@@ -39,14 +39,14 @@ const ToggleSetting = (props: ToggleSettingProps) => {
 const SliderSetting = (props: SliderSettingProps) => {
   return (
     <div className="flex w-full flex-row items-center justify-between gap-x-2">
-      <p className="text-left font-bold text-white">
+      <span className="text-left font-bold text-white">
         {props.name}{" "}
         {props.tooltip && (
           <Tooltip content={props.tooltip}>
             <span className="ml-0.5 cursor-help">&#9432;</span>
           </Tooltip>
         )}
-      </p>
+      </span>
       <Slider
         min={props.min}
         max={props.max}
