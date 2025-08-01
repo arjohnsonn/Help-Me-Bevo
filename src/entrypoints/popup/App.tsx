@@ -1,16 +1,20 @@
 import Aurora from "@/components/Aurora";
-import AnimatedImage from "@/components/AnimatedImage";
-import Left from "@/assets/animations/bevo-wigwag/Left.png";
-import Middle from "@/assets/animations/bevo-wigwag/Middle.png";
-import Right from "@/assets/animations/bevo-wigwag/Right.png";
+import MovingAnimatedImage from "@/components/MovingAnimatedImage";
+import Walking1 from "@/assets/animations/bevo/walking/1.png";
+import Walking2 from "@/assets/animations/bevo/walking/2.png";
+import Walking3 from "@/assets/animations/bevo/walking/3.png";
+import Walking4 from "@/assets/animations/bevo/walking/4.png";
+import Idle1 from "@/assets/animations/bevo/idle/1.png";
+import Idle2 from "@/assets/animations/bevo/idle/2.png";
 import { SliderSetting, ToggleSetting } from "@/components/Setting";
 import { Button } from "@/components/ui/button";
 
 function App() {
-  const bevoFrames = [Middle, Left, Middle, Right];
+  const bevoWalkingFrames = [Walking1, Walking2, Walking3, Walking4];
+  const bevoIdleFrames = [Idle1, Idle2];
 
   return (
-    <div className="h-87 w-96 bg-neutral-900">
+    <div className="relative h-87 w-96 bg-neutral-900">
       <Aurora
         colorStops={["#BF5700", "#5B2F0B", "#5E3F1C"]}
         blend={1}
@@ -21,7 +25,7 @@ function App() {
       {/* relative so it appears over Aurora */}
       <div className="relative">
         <div className="flex flex-row items-center justify-between px-6 py-4">
-          <div className="flex flex-col gap-y-1">
+          <div className="flex flex-col gap-y-0.5">
             <p className="text-4xl font-black text-white">
               Help Me <span className="text-[#bf5700]">Bevo</span>
             </p>
@@ -29,13 +33,7 @@ function App() {
               Stay motivated submitting with Bevo
             </p>
           </div>
-          <AnimatedImage
-            images={bevoFrames}
-            interval={200}
-            delay={1000}
-            className="h-16 w-21 scale-x-[-1]"
-            alt="Bevo"
-          />
+          <Button className="h-12 w-12 bg-[#bf5700] font-bold">ON</Button>
         </div>
 
         <div className="grid grid-cols-2 gap-3 px-6">
@@ -92,6 +90,22 @@ If this is enabled and it's the default animation, there is no themed animation 
           </div>
         </div>
       </div>
+
+      <MovingAnimatedImage
+        images={bevoWalkingFrames}
+        idleImages={bevoIdleFrames}
+        interval={200}
+        idleInterval={600}
+        className="h-16 w-21"
+        alt="Moving Bevo"
+        containerWidth={384}
+        speed={1}
+        stopChance={0.015}
+        idleTimeMin={800}
+        idleTimeMax={2500}
+        directionChangeChance={0.4}
+        movementTickRate={40}
+      />
     </div>
   );
 }
