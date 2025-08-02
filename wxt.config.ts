@@ -5,8 +5,10 @@ import path from "path";
 // See https://wxt.dev/api/config.html
 export default defineConfig({
   srcDir: "src",
-  imports: false,
   modules: ["@wxt-dev/module-react"],
+  manifest: {
+    permissions: ["storage"],
+  },
   vite: () => ({
     plugins: [tailwindcss()],
     resolve: {
