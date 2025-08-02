@@ -6,8 +6,17 @@ import Walking3 from "@/assets/animations/bevo/walking/3.png";
 import Walking4 from "@/assets/animations/bevo/walking/4.png";
 import Idle1 from "@/assets/animations/bevo/idle/1.png";
 import Idle2 from "@/assets/animations/bevo/idle/2.png";
+import LHD from "@/assets/images/LHD.jpeg";
+import YikYak from "@/assets/images/YikYak.jpeg";
 import { SliderSetting, ToggleSetting } from "@/components/Setting";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { useEffect, useState } from "react";
 import * as storageItems from "@/lib/storage";
 
@@ -35,6 +44,8 @@ function App() {
     "stats-total": 0,
     clientId: 0,
   });
+
+  const [imageVisible, setImageVisible] = useState(false);
 
   useEffect(() => {
     const loadSettings = async () => {
@@ -112,9 +123,70 @@ function App() {
             </div>
 
             <div className="flex w-full flex-row gap-2">
-              <Button className="h-7 flex-1 bg-[#bf5700] font-bold">
-                Credits
-              </Button>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button className="h-7 flex-1 bg-[#bf5700] font-bold">
+                    Credits
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="border-none bg-neutral-800 text-white shadow">
+                  <DialogHeader>
+                    <DialogTitle className="font-black">Credits</DialogTitle>
+                  </DialogHeader>
+                  <div className="flex flex-col gap-1">
+                    <div className="flex flex-row justify-between">
+                      <p className="text-sm font-bold">Lead Developer</p>
+                      <p className="text-sm">Aiden Johnson</p>
+                    </div>
+                    <div className="flex flex-row justify-between">
+                      <p className="text-sm font-bold">Contributor</p>
+                      <p className="text-sm">Ethan Lanting</p>
+                    </div>
+                    <div className="flex flex-row justify-between">
+                      <p className="text-sm font-bold">Pixel Art Bevo</p>
+                      <p className="text-sm">Alex Bazan</p>
+                    </div>
+                    <div className="flex flex-row justify-between">
+                      <p className="text-sm font-bold">
+                        Original Bevo Animation
+                      </p>
+                      <p className="text-sm">Texas Football</p>
+                    </div>
+
+                    <p className="pt-2 text-center">
+                      Thank you to whoeever made the original{" "}
+                      <span className="relative inline-block">
+                        <span
+                          className="cursor-pointer text-[#bf5700] underline"
+                          onMouseEnter={() => setImageVisible(true)}
+                          onMouseLeave={() => setImageVisible(false)}
+                        >
+                          YikYak post
+                        </span>
+                        <div
+                          className={`absolute bottom-full left-1/2 mb-2 -translate-x-1/2 transform shadow transition-all duration-200 ${imageVisible ? "visible opacity-100" : "invisible opacity-0"}`}
+                        >
+                          <img
+                            src={YikYak}
+                            alt="Original YikYak post"
+                            className="h-auto w-48 max-w-none -translate-x-12 rounded-lg border border-neutral-600 shadow-lg"
+                          />
+                        </div>
+                      </span>{" "}
+                      coming up with the idea for this extension!
+                    </p>
+
+                    <div className="flex flex-row items-center justify-center gap-2 pt-2">
+                      <img
+                        src={LHD}
+                        alt="LHD Logo"
+                        className="h-5 w-5 rounded-sm"
+                      />
+                      <p className="">Adopted by Longhorn Developers</p>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
               <Button className="h-7 flex-1 bg-[#bf5700] font-bold">
                 Stats
               </Button>
@@ -165,7 +237,7 @@ function App() {
         idleImages={bevoIdleFrames}
         interval={200}
         idleInterval={600}
-        className="h-16 w-21"
+        className="h-16 w-21 pointer-events-none"
         alt="Moving Bevo"
         containerWidth={384}
         speed={1}
