@@ -154,7 +154,7 @@ function App() {
                     </div>
 
                     <p className="pt-2 text-center">
-                      Thank you to whoeever made the original{" "}
+                      Thank you to whoever made the original{" "}
                       <span className="relative inline-block">
                         <span
                           className="cursor-pointer text-[#bf5700] underline"
@@ -164,7 +164,7 @@ function App() {
                           YikYak post
                         </span>
                         <div
-                          className={`absolute bottom-full left-1/2 mb-2 -translate-x-1/2 transform shadow transition-all duration-200 ${imageVisible ? "visible opacity-100" : "invisible opacity-0"}`}
+                          className={`absolute bottom-full left-1/2 mb-2 -translate-x-1/2 transform shadow-lg transition-all duration-200 ${imageVisible ? "visible opacity-100" : "invisible opacity-0"}`}
                         >
                           <img
                             src={YikYak}
@@ -187,9 +187,74 @@ function App() {
                   </div>
                 </DialogContent>
               </Dialog>
-              <Button className="h-7 flex-1 bg-[#bf5700] font-bold">
-                Stats
-              </Button>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button className="h-7 flex-1 bg-[#bf5700] font-bold">
+                    Stats
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="border-none bg-neutral-800 text-white shadow">
+                  <DialogHeader>
+                    <DialogTitle className="font-black">Statistics</DialogTitle>
+                  </DialogHeader>
+
+                  <div className="flex flex-col gap-2">
+                    <div className="flex flex-row justify-between rounded-lg bg-[#bf5700]/20 px-3 py-2">
+                      <p className="text-sm font-black text-white">
+                        Total Submissions
+                      </p>
+                      <p className="text-sm font-black text-[#bf5700]">
+                        {settings["stats-total"]}
+                      </p>
+                    </div>
+                    <div className="flex flex-col gap-1 rounded-lg bg-black/30 px-3 py-2">
+                      <p className="text-sm font-black text-white">Canvas</p>
+                      <div className="flex flex-row justify-between">
+                        <p className="text-xs">Assignments</p>
+                        <p className="text-xs font-bold">
+                          {settings["stats-assignments"]}
+                        </p>
+                      </div>
+                      <div className="flex flex-row justify-between">
+                        <p className="text-xs">Quizzes</p>
+                        <p className="text-xs font-bold">
+                          {settings["stats-quizzes"]}
+                        </p>
+                      </div>
+                      <div className="flex flex-row justify-between">
+                        <p className="text-xs">Discussions</p>
+                        <p className="text-xs font-bold">
+                          {settings["stats-discussions"]}
+                        </p>
+                      </div>
+                      <div className="flex flex-row justify-between">
+                        <p className="text-xs">Other</p>
+                        <p className="text-xs font-bold">
+                          {settings["stats-other"]}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col gap-1 rounded-lg bg-black/30 px-3 py-2">
+                      <p className="text-sm font-black text-white">
+                        Integrations
+                      </p>
+                      <div className="flex flex-row justify-between">
+                        <p className="text-xs">Gradescope</p>
+                        <p className="text-xs font-bold">
+                          {settings["stats-gradescope"]}
+                        </p>
+                      </div>
+                      <div className="flex flex-row justify-between">
+                        <p className="text-xs">Google Classroom</p>
+                        <p className="text-xs font-bold">
+                          {settings["stats-classroom"]}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
           <div className="flex flex-col gap-2">
@@ -237,7 +302,7 @@ function App() {
         idleImages={bevoIdleFrames}
         interval={200}
         idleInterval={600}
-        className="h-16 w-21 pointer-events-none"
+        className="pointer-events-none h-16 w-21"
         alt="Moving Bevo"
         containerWidth={384}
         speed={1}
