@@ -6,6 +6,7 @@ import {
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "~/assets/tailwind.css";
+import "./styles.css";
 import App from "./App";
 
 export default defineContentScript({
@@ -13,23 +14,19 @@ export default defineContentScript({
   cssInjectionMode: "ui",
 
   async main(ctx) {
-    const ui = await createUi(ctx);
-    ui.mount();
+    // The App component will create shadow roots for video overlay and wrapped popup
+    const app = <App ctx={ctx} />;
+    
+    // Create a container div for the app logic (not visible)
+    const container = document.createElement("div");
+    container.style.display = "none";
+    document.body.appendChild(container);
+    
+    // Mount the app
+    ReactDOM.createRoot(container).render(
+      <React.StrictMode>
+        {app}
+      </React.StrictMode>
+    );
   },
 });
-
-function createUi(ctx: ContentScriptContext) {
-  return createShadowRootUi(ctx, {
-    name: "tailwind-shadow-root-example",
-    position: "inline",
-    anchor: "body",
-    append: "first",
-    onMount: (uiContainer) => {
-      ReactDOM.createRoot(uiContainer).render(
-        <React.StrictMode>
-          <App />
-        </React.StrictMode>
-      );
-    },
-  });
-}

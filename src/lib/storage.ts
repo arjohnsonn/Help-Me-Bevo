@@ -87,6 +87,68 @@ export const clientId = storage.defineItem<number>("local:clientId", {
   fallback: 0,
 });
 
+// Playing state: [timestamp, isPlaying, type]
+export const playing = storage.defineItem<[number, boolean, string] | null>(
+  "local:playing",
+  {
+    fallback: null,
+  },
+);
+
+// Personal statistics for wrapped
+export interface PersonalStats {
+  [semester: string]: {
+    busiestHour: Record<number, number>;
+    busiestDay: Record<number, number>;
+    weekendSubmissions: number;
+    weekdaySubmissions: number;
+    courses: Record<string, number>;
+    timeWatched: number;
+    lastMinuteSubmissions: number;
+    mostProcrastinatedAssignment: {
+      name: string;
+      timeLeft: number;
+    };
+    earliestAssignment: {
+      name: string;
+      timeLeft: number;
+    };
+  };
+}
+
+export const personalStats = storage.defineItem<PersonalStats>(
+  "local:personalStats",
+  {
+    fallback: {
+      SPRING_2025: {
+        busiestHour: {},
+        busiestDay: {},
+        weekendSubmissions: 0,
+        weekdaySubmissions: 0,
+        courses: {},
+        timeWatched: 0,
+        lastMinuteSubmissions: 0,
+        mostProcrastinatedAssignment: {
+          name: "",
+          timeLeft: -1,
+        },
+        earliestAssignment: {
+          name: "",
+          timeLeft: -1,
+        },
+      },
+    },
+  },
+);
+
+// Wrapped popup visibility
+export const wrappedPopupVisible_S25 = storage.defineItem<boolean>(
+  "local:wrappedPopupVisible_S25",
+  {
+    fallback: true,
+  },
+);
+
 export async function getAllSettings() {
   const [
     enabledVal,
@@ -107,6 +169,9 @@ export async function getAllSettings() {
     statsQuizzesVal,
     statsTotalVal,
     clientIdVal,
+    playingVal,
+    personalStatsVal,
+    wrappedPopupVisibleVal,
   ] = await Promise.all([
     enabled.getValue(),
     assignmentName.getValue(),
@@ -126,6 +191,9 @@ export async function getAllSettings() {
     statsQuizzes.getValue(),
     statsTotal.getValue(),
     clientId.getValue(),
+    playing.getValue(),
+    personalStats.getValue(),
+    wrappedPopupVisible_S25.getValue(),
   ]);
 
   return {
@@ -147,6 +215,9 @@ export async function getAllSettings() {
     "stats-quizzes": statsQuizzesVal,
     "stats-total": statsTotalVal,
     clientId: clientIdVal,
+    playing: playingVal,
+    personalStats: personalStatsVal,
+    wrappedPopupVisible_S25: wrappedPopupVisibleVal,
   };
 }
 
@@ -206,6 +277,15 @@ export async function setSetting(key: string, value: any) {
     case "clientId":
       await clientId.setValue(value);
       break;
+    case "playing":
+      await playing.setValue(value);
+      break;
+    case "personalStats":
+      await personalStats.setValue(value);
+      break;
+    case "wrappedPopupVisible_S25":
+      await wrappedPopupVisible_S25.setValue(value);
+      break;
   }
 }
 
@@ -228,4 +308,7 @@ export const storageItems = {
   statsQuizzes,
   statsTotal,
   clientId,
+  playing,
+  personalStats,
+  wrappedPopupVisible_S25,
 };
