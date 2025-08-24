@@ -201,6 +201,9 @@ export default function App({ ctx }: AppProps) {
     // Calculate watch time
     const watchDuration = Date.now() / 1000 - watchTimeStartRef.current;
     if (personalStatsRef.current) {
+      // Ensure the current semester exists
+      ensureSemesterExists(personalStatsRef.current, SEMESTER);
+      
       personalStatsRef.current[SEMESTER].timeWatched += Math.floor(
         watchDuration + 0.5,
       );
@@ -210,9 +213,35 @@ export default function App({ ctx }: AppProps) {
     await storage.setSetting("playing", [Date.now() / 1000, false, null]);
   };
 
+  // Helper function to ensure semester exists in personalStats
+  const ensureSemesterExists = (personalStats: storage.PersonalStats, semester: string) => {
+    if (!personalStats[semester]) {
+      personalStats[semester] = {
+        busiestHour: {},
+        busiestDay: {},
+        weekendSubmissions: 0,
+        weekdaySubmissions: 0,
+        courses: {},
+        timeWatched: 0,
+        lastMinuteSubmissions: 0,
+        mostProcrastinatedAssignment: {
+          name: "",
+          timeLeft: -1,
+        },
+        earliestAssignment: {
+          name: "",
+          timeLeft: -1,
+        },
+      };
+    }
+  };
+
   // Log statistics for wrapped
   const logStatistics = async (type: ButtonType) => {
     if (!personalStatsRef.current) return;
+
+    // Ensure the current semester exists
+    ensureSemesterExists(personalStatsRef.current, SEMESTER);
 
     const stats = personalStatsRef.current[SEMESTER];
     const now = new Date();
