@@ -47,13 +47,19 @@ function App() {
   });
 
   const [imageVisible, setImageVisible] = useState(false);
+  const [version, setVersion] = useState("");
 
   useEffect(() => {
     const loadSettings = async () => {
       const allSettings = await storageItems.getAllSettings();
       setSettings(allSettings);
     };
+    const loadVersion = async () => {
+      const manifest = browser.runtime.getManifest();
+      setVersion(manifest.version);
+    };
     loadSettings();
+    loadVersion();
   }, []);
 
   const updateSetting = async (key: string, value: any) => {
@@ -215,7 +221,8 @@ function App() {
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="border-none bg-neutral-800 text-white shadow">
-                  <DialogHeader>
+                  <DialogHeader className="relative">
+                    <p className="absolute left-0 top-0 text-xs text-neutral-400">v{version}</p>
                     <DialogTitle className="font-black">Statistics</DialogTitle>
                   </DialogHeader>
 
