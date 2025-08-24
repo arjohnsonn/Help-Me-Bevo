@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import { useEffect, useState } from "react";
 import * as storageItems from "@/lib/storage";
+import { browser } from "wxt/browser";
 
 function App() {
   const bevoWalkingFrames = [Walking1, Walking2, Walking3, Walking4];
@@ -58,6 +59,21 @@ function App() {
   const updateSetting = async (key: string, value: any) => {
     await storageItems.setSetting(key, value);
     setSettings((prev) => ({ ...prev, [key]: value }));
+    
+    // Send message to all content scripts to update their settings in real-time
+    try {
+      const tabs = await browser.tabs.query({});
+      for (const tab of tabs) {
+        if (tab.id) {
+          browser.tabs.sendMessage(tab.id, ["changeValue", key, value]).catch(() => {
+            // Ignore errors if content script is not loaded on this tab
+          });
+        }
+      }
+    } catch (error) {
+      // Ignore permission errors for tabs we can't access
+      console.log("Could not send setting update to some tabs:", error);
+    }
   };
 
   return (

@@ -10,7 +10,11 @@ import "./styles.css";
 import App from "./App";
 
 export default defineContentScript({
-  matches: ["*://*/*"],
+  matches: [
+    "https://*.instructure.com/*",
+    "https://www.gradescope.com/*", 
+    "https://classroom.google.com/*"
+  ],
   cssInjectionMode: "ui",
 
   async main(ctx) {

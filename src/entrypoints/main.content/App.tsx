@@ -1,473 +1,367 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
-import ReactDOM from "react-dom/client";
-import { createShadowRootUi, type ContentScriptContext } from "#imports";
+import React, { useEffect, useState, useRef } from "react";
+import VideoOverlay from "../../components/ContentScript/VideoOverlay";
+import WrappedPopup from "../../components/ContentScript/WrappedPopup";
+import { useButtonObserver, ButtonType } from "../../hooks/useButtonObserver";
+import {
+  getAssignmentName,
+  getCourseName,
+  getDueDate,
+  isValidVideo,
+} from "../../lib/content-utils";
+import * as storage from "../../lib/storage";
 import { browser } from "wxt/browser";
-import VideoOverlay from "@/components/ContentScript/VideoOverlay";
-import WrappedPopup from "@/components/ContentScript/WrappedPopup";
-import { useButtonObserver, type ButtonType } from "@/hooks/useButtonObserver";
-import { 
-  getAssignmentName, 
-  getCourseName, 
-  getDueDate, 
-  isValidVideo 
-} from "@/lib/content-utils";
-import { logStatistics, addWatchTime } from "@/lib/statistics";
-import * as storage from "@/lib/storage";
+import { type ContentScriptContext } from "#imports";
 
+// Video URLs
 const fullVideoURL = "https://aidenjohnson.dev/Images/BevoCrop.mp4";
 const themedVideoURL = "https://aidenjohnson.dev/Images/ThemedBevo.mp4";
 const blankVideoURL = "https://aidenjohnson.dev/Images/BlankBevo.mp4";
+
+// Debug settings
+const debug = false;
+const DEBUG_ASSIGNMENT_NAME = "";
+const SEMESTER = "FALL_2025";
 
 interface AppProps {
   ctx: ContentScriptContext;
 }
 
-const App: React.FC<AppProps> = ({ ctx }) => {
-  // Settings state
-  const [enabled, setEnabled] = useState(true);
-  const [assignments, setAssignments] = useState(true);
-  const [quizzes, setQuizzes] = useState(false);
-  const [discussions, setDiscussions] = useState(true);
-  const [other, setOther] = useState(true);
-  const [classroom, setClassroom] = useState(true);
-  const [gradescope, setGradescope] = useState(true);
-  const [themedAnims, setThemedAnims] = useState(true);
-  const [assignmentName, setAssignmentName] = useState(true);
-  const [volume, setVolume] = useState(50);
-  const [wrappedVisible, setWrappedVisible] = useState(true);
+export default function App({ ctx }: AppProps) {
+  // State for all settings
+  const [settings, setSettings] = useState({
+    enabled: true,
+    assignmentName: true,
+    assignments: true,
+    quizzes: false,
+    discussions: true,
+    other: true,
+    classroom: true,
+    gradescope: true,
+    themedAnims: true,
+    volume: 50,
+  });
 
-  // UI state
-  const [showVideo, setShowVideo] = useState(false);
-  const [showWrapped, setShowWrapped] = useState(false);
+  // Video playing state
+  const [isPlaying, setIsPlaying] = useState(false);
   const [currentVideoUrl, setCurrentVideoUrl] = useState(fullVideoURL);
-  const [currentAssignmentName, setCurrentAssignmentName] = useState<string | null>(null);
-  const [playing, setPlaying] = useState(false);
-  
-  // Refs for UI components
-  const videoUiRef = useRef<any>(null);
-  const wrappedUiRef = useRef<any>(null);
-  const debugUiRef = useRef<any>(null);
-  const watchTimeRef = useRef<number>(0);
-  
-  // Debug mode
-  const [debugMode, setDebugMode] = useState(false);
+  const [currentAssignmentName, setCurrentAssignmentName] = useState<
+    string | null
+  >(null);
+  const [watchTime, setWatchTime] = useState(0);
 
-  // Load settings from storage
+  // Stats
+  const [stats, setStats] = useState({
+    total: 0,
+    assignments: 0,
+    quizzes: 0,
+    discussions: 0,
+    other: 0,
+    classroom: 0,
+    gradescope: 0,
+  });
+
+  // Wrapped popup state
+  const [showWrappedPopup, setShowWrappedPopup] = useState(false);
+
+  // Refs for persistent state
+  const personalStatsRef = useRef<storage.PersonalStats | null>(null);
+  const watchTimeStartRef = useRef(0);
+
+  // Load settings and stats on mount
   useEffect(() => {
-    const loadSettings = async () => {
-      const settings = await storage.getAllSettings();
-      setEnabled(settings.enabled);
-      setAssignments(settings.assignments);
-      setQuizzes(settings.quizzes);
-      setDiscussions(settings.discussions);
-      setOther(settings.other);
-      setClassroom(settings.classroom);
-      setGradescope(settings.gradescope);
-      setThemedAnims(settings.themedAnims);
-      setAssignmentName(settings.assignmentName);
-      setVolume(settings.volume);
-      setWrappedVisible(settings.wrappedPopupVisible_S25);
+    const loadData = async () => {
+      const allSettings = await storage.getAllSettings();
 
-      // Check if video was playing before reload
-      if (settings.playing) {
-        const [timestamp, wasPlaying, type] = settings.playing;
+      setSettings({
+        enabled: allSettings.enabled,
+        assignmentName: allSettings.assignmentName,
+        assignments: allSettings.assignments,
+        quizzes: allSettings.quizzes,
+        discussions: allSettings.discussions,
+        other: allSettings.other,
+        classroom: allSettings.classroom,
+        gradescope: allSettings.gradescope,
+        themedAnims: allSettings.themedAnims,
+        volume: allSettings.volume,
+      });
+
+      setStats({
+        total: allSettings["stats-total"],
+        assignments: allSettings["stats-assignments"],
+        quizzes: allSettings["stats-quizzes"],
+        discussions: allSettings["stats-discussions"],
+        other: allSettings["stats-other"],
+        classroom: allSettings["stats-classroom"],
+        gradescope: allSettings["stats-gradescope"],
+      });
+
+      personalStatsRef.current = allSettings.personalStats;
+
+      // Check for resumed playing state
+      const playingState = allSettings.playing;
+      if (playingState) {
+        const [timestamp, wasPlaying, type] = playingState;
         if (wasPlaying && Date.now() / 1000 - timestamp < 4) {
-          handleButtonClick(type as ButtonType);
-        } else {
-          await storage.playing.setValue(null);
+          handleDisplayBevo(type as ButtonType, true);
+        } else if (wasPlaying) {
+          await storage.setSetting("playing", null);
         }
       }
-      
-      // Enable debug mode based on URL parameter or storage
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get('bevo-debug') === 'true' || settings.volume === 0) {
-        console.log('Help Me Bevo: Debug mode enabled');
-        setDebugMode(true);
+
+      // Check wrapped popup visibility
+      if (allSettings.wrappedPopupVisible_S25) {
+        checkWrappedFeatureFlag();
       }
     };
 
-    loadSettings();
+    loadData();
+    console.log("Help Me Bevo: content.js loaded");
   }, []);
 
-  // Simple unmute on click (like the old implementation)
-  useEffect(() => {
-    const handleClick = () => {
-      if (!playing) return;
-      
-      // Find video element in shadow root and unmute it
-      if (videoUiRef.current) {
-        const video = videoUiRef.current.container?.querySelector('video');
-        if (video) {
-          video.muted = false;
-        }
+  const checkWrappedFeatureFlag = async () => {
+    try {
+      const response = await fetch(
+        "https://www.aidenjohnson.dev/api/help-me-bevo-fflags",
+      );
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+      const flags = await response.json();
+      // Hard code bypass for testing purposes
+      if (
+        flags.Wrapped ||
+        (settings.volume === 0 && !settings.themedAnims && !settings.other)
+      ) {
+        setShowWrappedPopup(true);
       }
-    };
-
-    document.addEventListener('click', handleClick);
-    return () => document.removeEventListener('click', handleClick);
-  }, [playing]);
-
-  // Handle video end
-  const handleVideoEnd = useCallback(async () => {
-    setShowVideo(false);
-    setPlaying(false);
-    setCurrentAssignmentName(null);
-    
-    if (videoUiRef.current) {
-      videoUiRef.current.remove();
+    } catch (err) {
+      console.error("Error fetching feature flags:", err);
     }
+  };
 
-    // Track watch time
-    const watchTime = Date.now() / 1000 - watchTimeRef.current;
-    await addWatchTime(watchTime);
+  // Handle Bevo display when button is clicked
+  const handleDisplayBevo = async (
+    type: ButtonType,
+    skipAnalytics: boolean = false,
+  ) => {
+    if (!settings.enabled || isPlaying) return;
+    if (type === "assignments" && !settings.assignments) return;
+    if (type === "quizzes" && !settings.quizzes) return;
+    if (type === "discussions" && !settings.discussions) return;
+    if (type === "gradescope" && !settings.gradescope) return;
+    if (type === "classroom" && !settings.classroom) return;
+    if (type === "other" && !settings.other) return;
 
-    await storage.playing.setValue(null);
-  }, []);
-
-  // Handle skip
-  const handleSkip = useCallback(() => handleVideoEnd(), [handleVideoEnd]);
-
-  // Handle wrapped popup actions
-  const handleWrappedClose = useCallback(() => {
-    setShowWrapped(false);
-    if (wrappedUiRef.current) {
-      wrappedUiRef.current.remove();
-    }
-  }, []);
-
-  const handleWrappedShow = useCallback(async () => {
-    await browser.runtime.sendMessage("wrappedshow");
-    await storage.wrappedPopupVisible_S25.setValue(false);
-    
-    // Send message to background script to open the wrapped page
-    // This avoids shadow DOM restrictions
-    await browser.runtime.sendMessage("openWrapped");
-    
-    handleWrappedClose();
-  }, [handleWrappedClose]);
-
-  const handleWrappedHide = useCallback(async () => {
-    await storage.wrappedPopupVisible_S25.setValue(false);
-    handleWrappedClose();
-  }, [handleWrappedClose]);
-
-  // Handle button clicks
-  const handleButtonClick = useCallback(async (type: ButtonType) => {
-    if (!enabled || playing) return;
-
-    // Check if specific type is enabled
-    if (
-      (type === "assignments" && !assignments) ||
-      (type === "quizzes" && !quizzes) ||
-      (type === "discussions" && !discussions) ||
-      (type === "gradescope" && !gradescope) ||
-      (type === "classroom" && !classroom) ||
-      (type === "other" && !other)
-    ) {
-      return;
-    }
-
-    const assignmentNameStr = getAssignmentName(type);
-    const courseName = getCourseName(type);
-    const dueDate = getDueDate(type);
-
-    // Determine video URL
+    const assignmentName = getAssignmentName(type);
     let videoUrl = fullVideoURL;
-    if (themedAnims) {
+
+    if (settings.themedAnims) {
       const isValid = await isValidVideo(themedVideoURL);
       if (isValid) {
         videoUrl = themedVideoURL;
-      } else if (assignmentNameStr && assignmentName) {
+      } else if (assignmentName && settings.assignmentName) {
         videoUrl = blankVideoURL;
-        setCurrentAssignmentName(assignmentNameStr);
+        setCurrentAssignmentName(assignmentName);
       }
+      console.log("Themed video " + (isValid ? "exists" : "doesn't exist"));
     }
 
     setCurrentVideoUrl(videoUrl);
-    setPlaying(true);
-    setShowVideo(true);
-    watchTimeRef.current = Date.now() / 1000;
+    setCurrentAssignmentName(assignmentName);
+    setIsPlaying(true);
+    setWatchTime(Date.now() / 1000);
+    watchTimeStartRef.current = Date.now() / 1000;
 
     // Save playing state
-    await storage.playing.setValue([Date.now() / 1000, true, type]);
+    await storage.setSetting("playing", [Date.now() / 1000, true, type]);
 
-    // Mount the video UI
-    if (videoUiRef.current) {
-      videoUiRef.current.mount();
+    if (!skipAnalytics) {
+      logStatistics(type);
+      // Send analytics
+      sendAnalytic("bevo");
+      sendAnalytic(type);
+
+      // Update stats
+      const newStats = { ...stats };
+      newStats.total++;
+      newStats[type as keyof typeof stats]++;
+      setStats(newStats);
+
+      // Save stats
+      await storage.setSetting("stats-total", newStats.total);
+      await storage.setSetting(
+        `stats-${type}`,
+        newStats[type as keyof typeof stats],
+      );
+    }
+  };
+
+  // Handle video end or skip
+  const handleVideoEnd = async () => {
+    setIsPlaying(false);
+    setCurrentAssignmentName(null);
+
+    // Calculate watch time
+    const watchDuration = Date.now() / 1000 - watchTimeStartRef.current;
+    if (personalStatsRef.current) {
+      personalStatsRef.current[SEMESTER].timeWatched += Math.floor(
+        watchDuration + 0.5,
+      );
+      await storage.setSetting("personalStats", personalStatsRef.current);
     }
 
-    // Log statistics
-    await logStatistics(type, assignmentNameStr, courseName, dueDate);
+    await storage.setSetting("playing", [Date.now() / 1000, false, null]);
+  };
 
-    // Update stats
-    switch (type) {
-      case "assignments":
-        const assignmentsValue = await storage.statsAssignments.getValue();
-        await storage.statsAssignments.setValue(assignmentsValue + 1);
-        break;
-      case "quizzes":
-        const quizzesValue = await storage.statsQuizzes.getValue();
-        await storage.statsQuizzes.setValue(quizzesValue + 1);
-        break;
-      case "discussions":
-        const discussionsValue = await storage.statsDiscussions.getValue();
-        await storage.statsDiscussions.setValue(discussionsValue + 1);
-        break;
-      case "gradescope":
-        const gradescopeValue = await storage.statsGradescope.getValue();
-        await storage.statsGradescope.setValue(gradescopeValue + 1);
-        break;
-      case "classroom":
-        const classroomValue = await storage.statsClassroom.getValue();
-        await storage.statsClassroom.setValue(classroomValue + 1);
-        break;
-      case "other":
-        const otherValue = await storage.statsOther.getValue();
-        await storage.statsOther.setValue(otherValue + 1);
-        break;
+  // Log statistics for wrapped
+  const logStatistics = async (type: ButtonType) => {
+    if (!personalStatsRef.current) return;
+
+    const stats = personalStatsRef.current[SEMESTER];
+    const now = new Date();
+
+    // Busiest Day
+    const dayOfWeek = now.getDay();
+    stats.busiestDay[dayOfWeek] = (stats.busiestDay[dayOfWeek] ?? 0) + 1;
+
+    // Busiest Hour
+    const hour = now.getHours();
+    stats.busiestHour[hour] = (stats.busiestHour[hour] ?? 0) + 1;
+
+    // Weekend & Weekday Submissions
+    if (dayOfWeek === 0 || dayOfWeek === 6) {
+      stats.weekendSubmissions++;
+    } else {
+      stats.weekdaySubmissions++;
     }
 
-    // Update total stats
-    const totalValue = await storage.statsTotal.getValue();
-    await storage.statsTotal.setValue(totalValue + 1);
+    // Courses
+    const courseName = getCourseName(type);
+    if (courseName) {
+      stats.courses[courseName] = (stats.courses[courseName] ?? 0) + 1;
+    }
 
-    // Send analytics
-    await browser.runtime.sendMessage(type);
-    await browser.runtime.sendMessage("bevo");
-  }, [enabled, playing, assignments, quizzes, discussions, gradescope, classroom, other, themedAnims, assignmentName]);
+    // Last Minute Submissions & Assignment tracking
+    const dueDate = getDueDate(type);
+    if (dueDate) {
+      const timeLeft = dueDate - Math.floor(Date.now() / 1000);
 
-  // Create video overlay UI
-  useEffect(() => {
-    const createVideoUi = async () => {
-      const ui = await createShadowRootUi(ctx, {
-        name: "help-me-bevo-video",
-        position: "overlay",
-        onMount: (container) => {
-          const root = ReactDOM.createRoot(container);
-          root.render(
-            <VideoOverlay
-              videoUrl={currentVideoUrl}
-              assignmentName={currentAssignmentName}
-              volume={volume}
-              showAssignmentName={assignmentName && !!currentAssignmentName}
-              onVideoEnd={handleVideoEnd}
-              onSkip={handleSkip}
-            />
-          );
-        },
-      });
-      
-      videoUiRef.current = ui;
-    };
+      if (timeLeft < 30 * 60) {
+        // 30 minutes til due
+        stats.lastMinuteSubmissions++;
+      }
 
-    createVideoUi();
-
-    return () => {
-      videoUiRef.current?.remove();
-    };
-  }, [ctx, currentVideoUrl, currentAssignmentName, volume, assignmentName, handleVideoEnd, handleSkip]);
-
-  // Create wrapped popup UI
-  useEffect(() => {
-    const createWrappedUi = async () => {
-      if (!wrappedVisible) return;
-
-      // Check feature flags
-      try {
-        const res = await fetch("https://www.aidenjohnson.dev/api/help-me-bevo-fflags");
-        const flags = await res.json();
-        
-        // Hard code bypass for testing
-        if (flags.Wrapped || (volume === 0 && !themedAnims && !other)) {
-          const ui = await createShadowRootUi(ctx, {
-            name: "help-me-bevo-wrapped",
-            position: "inline",
-            anchor: "body",
-            append: "last",
-            onMount: (container) => {
-              const root = ReactDOM.createRoot(container);
-              root.render(
-                <WrappedPopup
-                  onShowClick={handleWrappedShow}
-                  onHideClick={handleWrappedHide}
-                  onClose={handleWrappedClose}
-                />
-              );
-            },
-          });
-          
-          wrappedUiRef.current = ui;
-          setShowWrapped(true);
-          ui.mount();
+      const assignmentName = getAssignmentName(type);
+      if (assignmentName) {
+        // Most Procrastinated Assignment
+        if (
+          stats.mostProcrastinatedAssignment.timeLeft === -1 ||
+          timeLeft < stats.mostProcrastinatedAssignment.timeLeft
+        ) {
+          stats.mostProcrastinatedAssignment = {
+            name: assignmentName,
+            timeLeft: timeLeft,
+          };
         }
-      } catch (err) {
-        console.error("Error fetching feature flags:", err);
+
+        // Earliest Assignment
+        if (
+          stats.earliestAssignment.timeLeft === -1 ||
+          timeLeft > stats.earliestAssignment.timeLeft
+        ) {
+          stats.earliestAssignment = {
+            name: assignmentName,
+            timeLeft: timeLeft,
+          };
+        }
       }
-    };
+    }
 
-    createWrappedUi();
+    await storage.setSetting("personalStats", personalStatsRef.current);
+    console.log(personalStatsRef.current);
+  };
 
-    return () => {
-      wrappedUiRef.current?.remove();
-    };
-  }, [ctx, wrappedVisible, volume, themedAnims, other, handleWrappedShow, handleWrappedHide, handleWrappedClose]);
+  // Send analytics to background script
+  const sendAnalytic = (data: string) => {
+    browser.runtime.sendMessage(data);
+  };
 
-  // Create debug button UI
+  // Message listener for popup communication
   useEffect(() => {
-    const createDebugUi = async () => {
-      if (!debugMode) {
-        console.log('Help Me Bevo: Debug mode is off, not creating debug button');
-        return;
-      }
-
-      console.log('Help Me Bevo: Creating debug button');
-      const ui = await createShadowRootUi(ctx, {
-        name: "help-me-bevo-debug",
-        position: "inline",
-        anchor: "body",
-        append: "last",
-        onMount: (container) => {
-          // Create debug button
-          const button = document.createElement("button");
-          button.textContent = "🤘 Trigger Bevo";
-          button.style.cssText = `
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            z-index: 99999;
-            background: #bf5700;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            font-family: system-ui, -apple-system, sans-serif;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-          `;
-          
-          button.addEventListener("mouseenter", () => {
-            button.style.background = "#ff8c00";
-          });
-          
-          button.addEventListener("mouseleave", () => {
-            button.style.background = "#bf5700";
-          });
-          
-          button.addEventListener("click", () => {
-            console.log('Help Me Bevo: Debug button clicked');
-            handleButtonClick("assignments");
-          });
-          
-          container.appendChild(button);
-          console.log('Help Me Bevo: Debug button mounted');
-        },
-      });
-      
-      debugUiRef.current = ui;
-      ui.mount();
-    };
-
-    createDebugUi();
-
-    return () => {
-      debugUiRef.current?.remove();
-    };
-  }, [ctx, debugMode, handleButtonClick]);
-
-  // Use button observer hook
-  useButtonObserver({
-    enabled,
-    assignments,
-    quizzes,
-    discussions,
-    gradescope,
-    classroom,
-    other,
-    onButtonClick: handleButtonClick,
-  });
-
-  // Listen for messages from popup
-  useEffect(() => {
-    const handleMessage = async (request: any) => {
+    const messageListener = (request: any) => {
       if (!request) return;
 
-      const [action, ...params] = request;
+      const action = request[0];
+      const data = request.slice(1);
 
       switch (action) {
         case "play":
-          handleButtonClick(params[0] as ButtonType);
+          handleDisplayBevo(data[0], false);
           break;
         case "updateVolume":
-          setVolume(params[0]);
-          await storage.volume.setValue(params[0]);
+          setSettings((prev) => ({ ...prev, volume: data[0] }));
           break;
         case "toggle":
-          setEnabled(params[0]);
-          await storage.enabled.setValue(params[0]);
+          setSettings((prev) => ({ ...prev, enabled: data[0] }));
           break;
         case "changeValue":
-          const [variable, value] = params;
-          switch (variable) {
-            case "assignments":
-              setAssignments(value);
-              await storage.assignments.setValue(value);
-              break;
-            case "quizzes":
-              setQuizzes(value);
-              await storage.quizzes.setValue(value);
-              break;
-            case "discussions":
-              setDiscussions(value);
-              await storage.discussions.setValue(value);
-              break;
-            case "other":
-              setOther(value);
-              await storage.other.setValue(value);
-              break;
-            case "classroom":
-              setClassroom(value);
-              await storage.classroom.setValue(value);
-              break;
-            case "gradescope":
-              setGradescope(value);
-              await storage.gradescope.setValue(value);
-              break;
-            case "themedAnims":
-              setThemedAnims(value);
-              await storage.themedAnims.setValue(value);
-              break;
-            case "assignmentName":
-              setAssignmentName(value);
-              await storage.assignmentName.setValue(value);
-              break;
-          }
+          const [, variable, value] = request;
+          setSettings((prev) => ({ ...prev, [variable]: value }));
           break;
       }
     };
 
-    browser.runtime.onMessage.addListener(handleMessage);
-    return () => {
-      browser.runtime.onMessage.removeListener(handleMessage);
-    };
+    browser.runtime.onMessage.addListener(messageListener);
+    return () => browser.runtime.onMessage.removeListener(messageListener);
   }, []);
 
-  // Listen for debug keyboard shortcut (Ctrl/Cmd + Shift + B)
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'B') {
-        e.preventDefault();
-        setDebugMode(prev => !prev);
-        console.log(`Debug mode ${!debugMode ? 'enabled' : 'disabled'}`);
-      }
-    };
+  // Handle wrapped popup actions
+  const handleWrappedShow = async () => {
+    sendAnalytic("wrappedshow");
+    await storage.setSetting("wrappedPopupVisible_S25", false);
+    setShowWrappedPopup(false);
+    // Open wrapped page
+    browser.runtime.sendMessage({ action: "openWrapped" });
+  };
 
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [debugMode]);
+  const handleWrappedHide = async () => {
+    await storage.setSetting("wrappedPopupVisible_S25", false);
+    setShowWrappedPopup(false);
+  };
 
-  // This component doesn't render anything visible
-  return null;
-};
+  // Button observer to detect submit buttons
+  useButtonObserver({
+    enabled: settings.enabled,
+    assignments: settings.assignments,
+    quizzes: settings.quizzes,
+    discussions: settings.discussions,
+    gradescope: settings.gradescope,
+    classroom: settings.classroom,
+    other: settings.other,
+    onButtonClick: (type: ButtonType) => handleDisplayBevo(type, false),
+  });
 
-export default App;
+  return (
+    <>
+      {isPlaying && (
+        <VideoOverlay
+          ctx={ctx}
+          videoUrl={currentVideoUrl}
+          assignmentName={currentAssignmentName}
+          volume={settings.volume}
+          onVideoEnd={handleVideoEnd}
+          onSkip={handleVideoEnd}
+          showAssignmentName={settings.assignmentName}
+          textHideTimeout={1.5}
+        />
+      )}
+
+      {showWrappedPopup && (
+        <WrappedPopup
+          onShowClick={handleWrappedShow}
+          onHideClick={handleWrappedHide}
+          onClose={() => setShowWrappedPopup(false)}
+        />
+      )}
+    </>
+  );
+}
