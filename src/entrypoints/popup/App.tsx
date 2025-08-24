@@ -60,14 +60,12 @@ function App() {
     await storageItems.setSetting(key, value);
     setSettings((prev) => ({ ...prev, [key]: value }));
     
-    // Send message to all content scripts exactly like the old extension
     try {
       const [tab] = await browser.tabs.query({
         active: true,
         lastFocusedWindow: true,
       });
       if (tab && tab.id !== undefined) {
-        // Send messages in the exact format as the old extension
         switch (key) {
           case "enabled":
             await browser.tabs.sendMessage(tab.id, ["toggle", value]);
@@ -80,7 +78,6 @@ function App() {
         }
       }
     } catch (error) {
-      // Optionally, handle the error here - content script may not be loaded
     }
   };
 

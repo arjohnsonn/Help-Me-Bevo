@@ -87,7 +87,6 @@ export const clientId = storage.defineItem<number>("local:clientId", {
   fallback: 0,
 });
 
-// Playing state: [timestamp, isPlaying, type]
 export const playing = storage.defineItem<[number, boolean, string] | null>(
   "local:playing",
   {
@@ -95,7 +94,6 @@ export const playing = storage.defineItem<[number, boolean, string] | null>(
   },
 );
 
-// Personal statistics for wrapped
 export interface PersonalStats {
   [semester: string]: {
     busiestHour: Record<number, number>;
@@ -141,7 +139,6 @@ export const personalStats = storage.defineItem<PersonalStats>(
   },
 );
 
-// Wrapped popup visibility
 export const wrappedPopupVisible_S25 = storage.defineItem<boolean>(
   "local:wrappedPopupVisible_S25",
   {

@@ -10,7 +10,7 @@ export default defineConfig({
     name: "Help Me Bevo",
     version: "5.0.0",
     description: "Tired of being demotivated to get assignments done?\n",
-    permissions: ["storage", "tabs"],
+    permissions: ["storage"],
     action: {
       default_title: "Help Me Bevo",
       default_icon: {

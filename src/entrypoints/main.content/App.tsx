@@ -12,12 +12,10 @@ import * as storage from "../../lib/storage";
 import { browser } from "wxt/browser";
 import { type ContentScriptContext } from "#imports";
 
-// Video URLs
 const fullVideoURL = "https://aidenjohnson.dev/Images/BevoCrop.mp4";
 const themedVideoURL = "https://aidenjohnson.dev/Images/ThemedBevo.mp4";
 const blankVideoURL = "https://aidenjohnson.dev/Images/BlankBevo.mp4";
 
-// Debug settings
 const debug = false;
 const DEBUG_ASSIGNMENT_NAME = "";
 const SEMESTER = "FALL_2025";
@@ -27,7 +25,6 @@ interface AppProps {
 }
 
 export default function App({ ctx }: AppProps) {
-  // State for all settings
   const [settings, setSettings] = useState({
     enabled: true,
     assignmentName: true,
@@ -41,7 +38,6 @@ export default function App({ ctx }: AppProps) {
     volume: 50,
   });
 
-  // Video playing state
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentVideoUrl, setCurrentVideoUrl] = useState(fullVideoURL);
   const [currentAssignmentName, setCurrentAssignmentName] = useState<
@@ -49,7 +45,6 @@ export default function App({ ctx }: AppProps) {
   >(null);
   const [watchTime, setWatchTime] = useState(0);
 
-  // Stats
   const [stats, setStats] = useState({
     total: 0,
     assignments: 0,
@@ -60,14 +55,10 @@ export default function App({ ctx }: AppProps) {
     gradescope: 0,
   });
 
-  // Wrapped popup state
   const [showWrappedPopup, setShowWrappedPopup] = useState(false);
-
-  // Refs for persistent state
   const personalStatsRef = useRef<storage.PersonalStats | null>(null);
   const watchTimeStartRef = useRef(0);
 
-  // Load settings and stats on mount
   useEffect(() => {
     const loadData = async () => {
       const allSettings = await storage.getAllSettings();
@@ -97,16 +88,13 @@ export default function App({ ctx }: AppProps) {
 
       personalStatsRef.current = allSettings.personalStats;
 
-      // Check for resumed playing state
       const playingState = allSettings.playing;
       if (playingState) {
         const [timestamp, wasPlaying, type] = playingState;
         const timeDiff = Date.now() / 1000 - timestamp;
-        
+
         if (wasPlaying && timeDiff < 4) {
-          // Resume video using storage settings (not React state which may not be updated yet)
           const resumeVideo = async () => {
-            // Check settings from storage
             if (!allSettings.enabled) return;
             if (type === "assignments" && !allSettings.assignments) return;
             if (type === "quizzes" && !allSettings.quizzes) return;
@@ -114,9 +102,8 @@ export default function App({ ctx }: AppProps) {
             if (type === "gradescope" && !allSettings.gradescope) return;
             if (type === "classroom" && !allSettings.classroom) return;
             if (type === "other" && !allSettings.other) return;
-            
-            // Start video
-            const assignmentName = getAssignmentName(type);
+
+            const assignmentName = getAssignmentName(type as ButtonType);
             let videoUrl = fullVideoURL;
 
             if (allSettings.themedAnims) {
@@ -128,21 +115,20 @@ export default function App({ ctx }: AppProps) {
                 setCurrentAssignmentName(assignmentName);
               }
             }
-            
+
             setCurrentVideoUrl(videoUrl);
             setCurrentAssignmentName(assignmentName);
             setIsPlaying(true);
             setWatchTime(Date.now() / 1000);
             watchTimeStartRef.current = Date.now() / 1000;
           };
-          
+
           setTimeout(resumeVideo, 100);
         } else if (wasPlaying) {
           await storage.setSetting("playing", null);
         }
       }
 
-      // Check wrapped popup visibility
       if (allSettings.wrappedPopupVisible_S25) {
         checkWrappedFeatureFlag();
       }
@@ -159,7 +145,6 @@ export default function App({ ctx }: AppProps) {
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
       const flags = await response.json();
-      // Hard code bypass for testing purposes
       if (
         flags.Wrapped ||
         (settings.volume === 0 && !settings.themedAnims && !settings.other)
@@ -171,7 +156,6 @@ export default function App({ ctx }: AppProps) {
     }
   };
 
-  // Handle Bevo display when button is clicked
   const handleDisplayBevo = async (
     type: ButtonType,
     skipAnalytics: boolean = false,
@@ -197,39 +181,26 @@ export default function App({ ctx }: AppProps) {
       }
     }
 
-    console.log("🎬 [Content] Starting video playback:", {
-      videoUrl,
-      assignmentName,
-      type,
-      currentIsPlaying: isPlaying
-    });
-    
     setCurrentVideoUrl(videoUrl);
     setCurrentAssignmentName(assignmentName);
     setIsPlaying(true);
     setWatchTime(Date.now() / 1000);
     watchTimeStartRef.current = Date.now() / 1000;
-    
-    console.log("🎬 [Content] Video state updated - isPlaying should now be true");
 
-    // Save playing state
     const playingStateData = [Date.now() / 1000, true, type];
-    console.log("🎬 [Content] Saving playing state:", playingStateData);
+
     await storage.setSetting("playing", playingStateData);
 
     if (!skipAnalytics) {
       logStatistics(type);
-      // Send analytics
       sendAnalytic("bevo");
       sendAnalytic(type);
 
-      // Update stats
       const newStats = { ...stats };
       newStats.total++;
       newStats[type as keyof typeof stats]++;
       setStats(newStats);
 
-      // Save stats
       await storage.setSetting("stats-total", newStats.total);
       await storage.setSetting(
         `stats-${type}`,
@@ -238,19 +209,14 @@ export default function App({ ctx }: AppProps) {
     }
   };
 
-  // Handle video end or skip
   const handleVideoEnd = async () => {
-    console.log("🎬 [Content] Video ended or skipped");
-    
     setIsPlaying(false);
     setCurrentAssignmentName(null);
 
-    // Calculate watch time
     const watchDuration = Date.now() / 1000 - watchTimeStartRef.current;
     if (personalStatsRef.current) {
-      // Ensure the current semester exists
       ensureSemesterExists(personalStatsRef.current, SEMESTER);
-      
+
       personalStatsRef.current[SEMESTER].timeWatched += Math.floor(
         watchDuration + 0.5,
       );
@@ -258,12 +224,14 @@ export default function App({ ctx }: AppProps) {
     }
 
     const clearPlayingStateData = [Date.now() / 1000, false, null];
-    console.log("🎬 [Content] Clearing playing state:", clearPlayingStateData);
+
     await storage.setSetting("playing", clearPlayingStateData);
   };
 
-  // Helper function to ensure semester exists in personalStats
-  const ensureSemesterExists = (personalStats: storage.PersonalStats, semester: string) => {
+  const ensureSemesterExists = (
+    personalStats: storage.PersonalStats,
+    semester: string,
+  ) => {
     if (!personalStats[semester]) {
       personalStats[semester] = {
         busiestHour: {},
@@ -285,50 +253,41 @@ export default function App({ ctx }: AppProps) {
     }
   };
 
-  // Log statistics for wrapped
   const logStatistics = async (type: ButtonType) => {
     if (!personalStatsRef.current) return;
 
-    // Ensure the current semester exists
     ensureSemesterExists(personalStatsRef.current, SEMESTER);
 
     const stats = personalStatsRef.current[SEMESTER];
     const now = new Date();
 
-    // Busiest Day
     const dayOfWeek = now.getDay();
     stats.busiestDay[dayOfWeek] = (stats.busiestDay[dayOfWeek] ?? 0) + 1;
 
-    // Busiest Hour
     const hour = now.getHours();
     stats.busiestHour[hour] = (stats.busiestHour[hour] ?? 0) + 1;
 
-    // Weekend & Weekday Submissions
     if (dayOfWeek === 0 || dayOfWeek === 6) {
       stats.weekendSubmissions++;
     } else {
       stats.weekdaySubmissions++;
     }
 
-    // Courses
     const courseName = getCourseName(type);
     if (courseName) {
       stats.courses[courseName] = (stats.courses[courseName] ?? 0) + 1;
     }
 
-    // Last Minute Submissions & Assignment tracking
     const dueDate = getDueDate(type);
     if (dueDate) {
       const timeLeft = dueDate - Math.floor(Date.now() / 1000);
 
       if (timeLeft < 30 * 60) {
-        // 30 minutes til due
         stats.lastMinuteSubmissions++;
       }
 
       const assignmentName = getAssignmentName(type);
       if (assignmentName) {
-        // Most Procrastinated Assignment
         if (
           stats.mostProcrastinatedAssignment.timeLeft === -1 ||
           timeLeft < stats.mostProcrastinatedAssignment.timeLeft
@@ -339,7 +298,6 @@ export default function App({ ctx }: AppProps) {
           };
         }
 
-        // Earliest Assignment
         if (
           stats.earliestAssignment.timeLeft === -1 ||
           timeLeft > stats.earliestAssignment.timeLeft
@@ -355,12 +313,10 @@ export default function App({ ctx }: AppProps) {
     await storage.setSetting("personalStats", personalStatsRef.current);
   };
 
-  // Send analytics to background script
   const sendAnalytic = (data: string) => {
     browser.runtime.sendMessage(data);
   };
 
-  // Message listener for popup communication - exact copy from old extension
   useEffect(() => {
     const listenerFuncs = {
       play: (request: any) => handleDisplayBevo(request[1], false),
@@ -382,55 +338,52 @@ export default function App({ ctx }: AppProps) {
     return () => browser.runtime.onMessage.removeListener(messageListener);
   }, []);
 
-  // Helper functions exactly like the old extension
   function changeValue(data: [string, string, boolean | string | number]) {
     const variable = data[1];
     const value = data[2];
 
     switch (variable) {
       case "assignments":
-        setSettings(prev => ({ ...prev, assignments: value as boolean }));
+        setSettings((prev) => ({ ...prev, assignments: value as boolean }));
         break;
       case "quizzes":
-        setSettings(prev => ({ ...prev, quizzes: value as boolean }));
+        setSettings((prev) => ({ ...prev, quizzes: value as boolean }));
         break;
       case "discussions":
-        setSettings(prev => ({ ...prev, discussions: value as boolean }));
+        setSettings((prev) => ({ ...prev, discussions: value as boolean }));
         break;
       case "other":
-        setSettings(prev => ({ ...prev, other: value as boolean }));
+        setSettings((prev) => ({ ...prev, other: value as boolean }));
         break;
       case "classroom":
-        setSettings(prev => ({ ...prev, classroom: value as boolean }));
+        setSettings((prev) => ({ ...prev, classroom: value as boolean }));
         break;
       case "gradescope":
-        setSettings(prev => ({ ...prev, gradescope: value as boolean }));
+        setSettings((prev) => ({ ...prev, gradescope: value as boolean }));
         break;
       case "themedAnims":
-        setSettings(prev => ({ ...prev, themedAnims: value as boolean }));
+        setSettings((prev) => ({ ...prev, themedAnims: value as boolean }));
         break;
       case "assignmentName":
-        setSettings(prev => ({ ...prev, assignmentName: value as boolean }));
+        setSettings((prev) => ({ ...prev, assignmentName: value as boolean }));
         break;
     }
   }
 
   function updateVolume(data: [null, number]) {
     const volume = data[1];
-    setSettings(prev => ({ ...prev, volume }));
+    setSettings((prev) => ({ ...prev, volume }));
   }
 
   function toggle(data: [null, boolean]) {
     const enabled = data[1];
-    setSettings(prev => ({ ...prev, enabled }));
+    setSettings((prev) => ({ ...prev, enabled }));
   }
 
-  // Handle wrapped popup actions
   const handleWrappedShow = async () => {
     sendAnalytic("wrappedshow");
     await storage.setSetting("wrappedPopupVisible_S25", false);
     setShowWrappedPopup(false);
-    // Open wrapped page
     browser.runtime.sendMessage({ action: "openWrapped" });
   };
 
@@ -439,7 +392,6 @@ export default function App({ ctx }: AppProps) {
     setShowWrappedPopup(false);
   };
 
-  // Button observer to detect submit buttons
   useButtonObserver({
     enabled: settings.enabled,
     assignments: settings.assignments,
@@ -451,8 +403,6 @@ export default function App({ ctx }: AppProps) {
     onButtonClick: (type: ButtonType) => handleDisplayBevo(type, false),
   });
 
-  console.log("🎬 [Content] Render - isPlaying:", isPlaying, "currentVideoUrl:", currentVideoUrl);
-  
   return (
     <>
       {isPlaying && (
