@@ -101,8 +101,42 @@ export default function App({ ctx }: AppProps) {
       const playingState = allSettings.playing;
       if (playingState) {
         const [timestamp, wasPlaying, type] = playingState;
-        if (wasPlaying && Date.now() / 1000 - timestamp < 4) {
-          handleDisplayBevo(type as ButtonType, true);
+        const timeDiff = Date.now() / 1000 - timestamp;
+        
+        if (wasPlaying && timeDiff < 4) {
+          // Resume video using storage settings (not React state which may not be updated yet)
+          const resumeVideo = async () => {
+            // Check settings from storage
+            if (!allSettings.enabled) return;
+            if (type === "assignments" && !allSettings.assignments) return;
+            if (type === "quizzes" && !allSettings.quizzes) return;
+            if (type === "discussions" && !allSettings.discussions) return;
+            if (type === "gradescope" && !allSettings.gradescope) return;
+            if (type === "classroom" && !allSettings.classroom) return;
+            if (type === "other" && !allSettings.other) return;
+            
+            // Start video
+            const assignmentName = getAssignmentName(type);
+            let videoUrl = fullVideoURL;
+
+            if (allSettings.themedAnims) {
+              const isValid = await isValidVideo(themedVideoURL);
+              if (isValid) {
+                videoUrl = themedVideoURL;
+              } else if (assignmentName && allSettings.assignmentName) {
+                videoUrl = blankVideoURL;
+                setCurrentAssignmentName(assignmentName);
+              }
+            }
+            
+            setCurrentVideoUrl(videoUrl);
+            setCurrentAssignmentName(assignmentName);
+            setIsPlaying(true);
+            setWatchTime(Date.now() / 1000);
+            watchTimeStartRef.current = Date.now() / 1000;
+          };
+          
+          setTimeout(resumeVideo, 100);
         } else if (wasPlaying) {
           await storage.setSetting("playing", null);
         }
@@ -163,14 +197,25 @@ export default function App({ ctx }: AppProps) {
       }
     }
 
+    console.log("🎬 [Content] Starting video playback:", {
+      videoUrl,
+      assignmentName,
+      type,
+      currentIsPlaying: isPlaying
+    });
+    
     setCurrentVideoUrl(videoUrl);
     setCurrentAssignmentName(assignmentName);
     setIsPlaying(true);
     setWatchTime(Date.now() / 1000);
     watchTimeStartRef.current = Date.now() / 1000;
+    
+    console.log("🎬 [Content] Video state updated - isPlaying should now be true");
 
     // Save playing state
-    await storage.setSetting("playing", [Date.now() / 1000, true, type]);
+    const playingStateData = [Date.now() / 1000, true, type];
+    console.log("🎬 [Content] Saving playing state:", playingStateData);
+    await storage.setSetting("playing", playingStateData);
 
     if (!skipAnalytics) {
       logStatistics(type);
@@ -195,6 +240,8 @@ export default function App({ ctx }: AppProps) {
 
   // Handle video end or skip
   const handleVideoEnd = async () => {
+    console.log("🎬 [Content] Video ended or skipped");
+    
     setIsPlaying(false);
     setCurrentAssignmentName(null);
 
@@ -210,7 +257,9 @@ export default function App({ ctx }: AppProps) {
       await storage.setSetting("personalStats", personalStatsRef.current);
     }
 
-    await storage.setSetting("playing", [Date.now() / 1000, false, null]);
+    const clearPlayingStateData = [Date.now() / 1000, false, null];
+    console.log("🎬 [Content] Clearing playing state:", clearPlayingStateData);
+    await storage.setSetting("playing", clearPlayingStateData);
   };
 
   // Helper function to ensure semester exists in personalStats
@@ -402,6 +451,8 @@ export default function App({ ctx }: AppProps) {
     onButtonClick: (type: ButtonType) => handleDisplayBevo(type, false),
   });
 
+  console.log("🎬 [Content] Render - isPlaying:", isPlaying, "currentVideoUrl:", currentVideoUrl);
+  
   return (
     <>
       {isPlaying && (
