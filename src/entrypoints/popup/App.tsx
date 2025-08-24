@@ -60,19 +60,27 @@ function App() {
     await storageItems.setSetting(key, value);
     setSettings((prev) => ({ ...prev, [key]: value }));
     
-    // Send message to all content scripts to update their settings in real-time
+    // Send message to all content scripts exactly like the old extension
     try {
-      const tabs = await browser.tabs.query({});
-      for (const tab of tabs) {
-        if (tab.id) {
-          browser.tabs.sendMessage(tab.id, ["changeValue", key, value]).catch(() => {
-            // Ignore errors if content script is not loaded on this tab
-          });
+      const [tab] = await browser.tabs.query({
+        active: true,
+        lastFocusedWindow: true,
+      });
+      if (tab && tab.id !== undefined) {
+        // Send messages in the exact format as the old extension
+        switch (key) {
+          case "enabled":
+            await browser.tabs.sendMessage(tab.id, ["toggle", value]);
+            break;
+          case "volume":
+            await browser.tabs.sendMessage(tab.id, ["updateVolume", Number(value)]);
+            break;
+          default:
+            await browser.tabs.sendMessage(tab.id, ["changeValue", key, value]);
         }
       }
     } catch (error) {
-      // Ignore permission errors for tabs we can't access
-      console.log("Could not send setting update to some tabs:", error);
+      // Optionally, handle the error here - content script may not be loaded
     }
   };
 

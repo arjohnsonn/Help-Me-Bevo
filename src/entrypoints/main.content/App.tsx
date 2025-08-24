@@ -115,7 +115,6 @@ export default function App({ ctx }: AppProps) {
     };
 
     loadData();
-    console.log("Help Me Bevo: content.js loaded");
   }, []);
 
   const checkWrappedFeatureFlag = async () => {
@@ -162,7 +161,6 @@ export default function App({ ctx }: AppProps) {
         videoUrl = blankVideoURL;
         setCurrentAssignmentName(assignmentName);
       }
-      console.log("Themed video " + (isValid ? "exists" : "doesn't exist"));
     }
 
     setCurrentVideoUrl(videoUrl);
@@ -277,7 +275,6 @@ export default function App({ ctx }: AppProps) {
     }
 
     await storage.setSetting("personalStats", personalStatsRef.current);
-    console.log(personalStatsRef.current);
   };
 
   // Send analytics to background script
@@ -285,34 +282,70 @@ export default function App({ ctx }: AppProps) {
     browser.runtime.sendMessage(data);
   };
 
-  // Message listener for popup communication
+  // Message listener for popup communication - exact copy from old extension
   useEffect(() => {
+    const listenerFuncs = {
+      play: (request: any) => handleDisplayBevo(request[1], false),
+      updateVolume: (request: any) => updateVolume(request),
+      toggle: (request: any) => toggle(request),
+      changeValue: (request: any) => changeValue(request),
+    };
+
     const messageListener = (request: any) => {
-      if (!request) return;
+      if (request == null) return;
 
-      const action = request[0];
-      const data = request.slice(1);
-
-      switch (action) {
-        case "play":
-          handleDisplayBevo(data[0], false);
-          break;
-        case "updateVolume":
-          setSettings((prev) => ({ ...prev, volume: data[0] }));
-          break;
-        case "toggle":
-          setSettings((prev) => ({ ...prev, enabled: data[0] }));
-          break;
-        case "changeValue":
-          const [, variable, value] = request;
-          setSettings((prev) => ({ ...prev, [variable]: value }));
-          break;
+      const action = request[0] as keyof typeof listenerFuncs;
+      if (listenerFuncs[action]) {
+        listenerFuncs[action](request);
       }
     };
 
     browser.runtime.onMessage.addListener(messageListener);
     return () => browser.runtime.onMessage.removeListener(messageListener);
   }, []);
+
+  // Helper functions exactly like the old extension
+  function changeValue(data: [string, string, boolean | string | number]) {
+    const variable = data[1];
+    const value = data[2];
+
+    switch (variable) {
+      case "assignments":
+        setSettings(prev => ({ ...prev, assignments: value as boolean }));
+        break;
+      case "quizzes":
+        setSettings(prev => ({ ...prev, quizzes: value as boolean }));
+        break;
+      case "discussions":
+        setSettings(prev => ({ ...prev, discussions: value as boolean }));
+        break;
+      case "other":
+        setSettings(prev => ({ ...prev, other: value as boolean }));
+        break;
+      case "classroom":
+        setSettings(prev => ({ ...prev, classroom: value as boolean }));
+        break;
+      case "gradescope":
+        setSettings(prev => ({ ...prev, gradescope: value as boolean }));
+        break;
+      case "themedAnims":
+        setSettings(prev => ({ ...prev, themedAnims: value as boolean }));
+        break;
+      case "assignmentName":
+        setSettings(prev => ({ ...prev, assignmentName: value as boolean }));
+        break;
+    }
+  }
+
+  function updateVolume(data: [null, number]) {
+    const volume = data[1];
+    setSettings(prev => ({ ...prev, volume }));
+  }
+
+  function toggle(data: [null, boolean]) {
+    const enabled = data[1];
+    setSettings(prev => ({ ...prev, enabled }));
+  }
 
   // Handle wrapped popup actions
   const handleWrappedShow = async () => {
