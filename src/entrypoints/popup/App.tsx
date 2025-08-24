@@ -113,7 +113,7 @@ function App() {
 
         <div className="grid grid-cols-2 gap-3 px-6">
           <div className="flex flex-col gap-2">
-            <div className="flex flex-col gap-2 rounded-lg bg-black/30 px-3 py-2">
+            <div className={`flex flex-col gap-2 rounded-lg bg-black/30 px-3 py-2 ${!settings.enabled ? 'opacity-80 pointer-events-none' : ''}`}>
               <p className="text-lg font-black text-white">Canvas</p>
               <ToggleSetting
                 name="Assignments"
@@ -157,11 +157,11 @@ function App() {
                   <div className="flex flex-col gap-1">
                     <div className="flex flex-row justify-between">
                       <p className="text-sm font-bold">Lead Developer</p>
-                      <p className="text-sm">Aiden Johnson</p>
+                      <a href="https://www.instagram.com/aidenn.johnson/" target="_blank" rel="noopener noreferrer" className="text-sm text-[#bf5700] hover:underline">Aiden Johnson</a>
                     </div>
                     <div className="flex flex-row justify-between">
                       <p className="text-sm font-bold">Contributor</p>
-                      <p className="text-sm">Ethan Lanting</p>
+                      <a href="https://www.instagram.com/ethan.lanting/" target="_blank" rel="noopener noreferrer" className="text-sm text-[#bf5700] hover:underline">Ethan Lanting</a>
                     </div>
                     <div className="flex flex-row justify-between">
                       <p className="text-sm font-bold">Pixel Art Bevo</p>
@@ -171,7 +171,7 @@ function App() {
                       <p className="text-sm font-bold">
                         Original Bevo Animation
                       </p>
-                      <p className="text-sm">Texas Football</p>
+                      <a href="https://www.instagram.com/texasfootball" target="_blank" rel="noopener noreferrer" className="text-sm text-[#bf5700] hover:underline">Texas Football</a>
                     </div>
 
                     <p className="pt-2 text-center">
@@ -279,7 +279,7 @@ function App() {
             </div>
           </div>
           <div className="flex flex-col gap-2">
-            <div className="flex flex-col gap-2 rounded-lg bg-black/30 px-3 py-2">
+            <div className={`flex flex-col gap-2 rounded-lg bg-black/30 px-3 py-2 ${!settings.enabled ? 'opacity-80 pointer-events-none' : ''}`}>
               <p className="text-lg font-black text-white">Integrations</p>
               <ToggleSetting
                 name="Gradescope"
@@ -292,7 +292,7 @@ function App() {
                 onChange={(checked) => updateSetting("classroom", checked)}
               />
             </div>
-            <div className="flex flex-col gap-2 rounded-lg bg-black/30 px-3 py-2">
+            <div className={`flex flex-col gap-2 rounded-lg bg-black/30 px-3 py-2 ${!settings.enabled ? 'opacity-80 pointer-events-none' : ''}`}>
               <p className="text-lg font-black text-white">Display</p>
               <SliderSetting
                 name="Volume"
