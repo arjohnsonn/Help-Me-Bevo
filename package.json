@@ -23,6 +23,7 @@
     "@vitejs/plugin-react": "^4.4.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "framer-motion": "^12.23.12",
     "lucide-react": "^0.510.0",
     "ogl": "^1.0.11",
     "prettier": "^3.5.3",
