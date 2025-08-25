@@ -131,15 +131,9 @@ export default function App({ ctx }: AppProps) {
         }
       }
 
-      console.log(
-        "Wrapped: wrappedPopupVisible_S25 =",
-        allSettings.wrappedPopupVisible_S25,
-      );
       if (allSettings.wrappedPopupVisible_S25) {
-        console.log("Wrapped: Checking feature flags");
         checkWrappedFeatureFlag();
       } else {
-        console.log("Wrapped: Popup disabled, not checking feature flags");
       }
     };
 
@@ -147,28 +141,22 @@ export default function App({ ctx }: AppProps) {
   }, []);
 
   const checkWrappedFeatureFlag = async () => {
-    console.log("Wrapped: Starting feature flag check");
     try {
       const response = await fetch(
         "https://www.aidenjohnson.dev/api/help-me-bevo-fflags",
       );
-      console.log("Wrapped: Feature flag response status:", response.status);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
       const flags = await response.json();
-      console.log("Wrapped: Feature flags received:", flags);
 
       if (
         flags.Wrapped ||
         (settings.volume === 0 && !settings.themedAnims && !settings.other)
       ) {
-        console.log("Wrapped: Conditions met, showing popup");
         setShowWrappedPopup(true);
       } else {
-        console.log("Wrapped: Conditions not met, not showing popup");
       }
     } catch (err) {
-      console.error("Wrapped: Error fetching feature flags:", err);
     }
   };
 
@@ -397,7 +385,6 @@ export default function App({ ctx }: AppProps) {
   }
 
   const handleWrappedShow = async () => {
-    console.log("Wrapped: Show button clicked");
     sendAnalytic("wrappedshow");
     await storage.setSetting("wrappedPopupVisible_S25", false);
     setShowWrappedPopup(false);
@@ -409,7 +396,6 @@ export default function App({ ctx }: AppProps) {
   };
 
   const handleWrappedHide = async () => {
-    console.log("Wrapped: Hide/Don't show again button clicked");
     await storage.setSetting("wrappedPopupVisible_S25", false);
     setShowWrappedPopup(false);
     if (wrappedPopupUiRef.current) {
@@ -419,7 +405,6 @@ export default function App({ ctx }: AppProps) {
   };
 
   const handleWrappedClose = () => {
-    console.log("Wrapped: X button clicked - just closing temporarily");
     setShowWrappedPopup(false);
     if (wrappedPopupUiRef.current) {
       wrappedPopupUiRef.current.remove();
@@ -441,14 +426,12 @@ export default function App({ ctx }: AppProps) {
   useEffect(() => {
     const createWrappedPopup = async () => {
       if (showWrappedPopup && !wrappedPopupUiRef.current) {
-        console.log("Wrapped: Creating shadow root for popup");
 
         const ui = await createShadowRootUi(ctx, {
           name: "wrapped-popup",
           position: "inline",
           anchor: "body",
           onMount: (container) => {
-            console.log("Wrapped: Shadow root mounted, container:", container);
 
             // Create a wrapper div to avoid React warnings
             const app = document.createElement("div");
@@ -465,16 +448,13 @@ export default function App({ ctx }: AppProps) {
             return root;
           },
           onRemove: (root) => {
-            console.log("Wrapped: Shadow root removing, root:", root);
             root?.unmount();
           },
         });
 
         wrappedPopupUiRef.current = ui;
-        console.log("Wrapped: Shadow root UI created, mounting...", ui);
         ui.mount();
       } else if (!showWrappedPopup && wrappedPopupUiRef.current) {
-        console.log("Wrapped: Removing shadow root popup");
         wrappedPopupUiRef.current.remove();
         wrappedPopupUiRef.current = null;
       }
