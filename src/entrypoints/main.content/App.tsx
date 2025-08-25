@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
+import ReactDOM from "react-dom/client";
 import VideoOverlay from "../../components/ContentScript/VideoOverlay";
 import WrappedPopup from "../../components/ContentScript/WrappedPopup";
 import { useButtonObserver, ButtonType } from "../../hooks/useButtonObserver";
@@ -10,7 +11,7 @@ import {
 } from "../../lib/content-utils";
 import * as storage from "../../lib/storage";
 import { browser } from "wxt/browser";
-import { type ContentScriptContext } from "#imports";
+import { type ContentScriptContext, createShadowRootUi } from "#imports";
 
 const fullVideoURL = "https://aidenjohnson.dev/Images/BevoCrop.mp4";
 const themedVideoURL = "https://aidenjohnson.dev/Images/ThemedBevo.mp4";
@@ -18,7 +19,7 @@ const blankVideoURL = "https://aidenjohnson.dev/Images/BlankBevo.mp4";
 
 const debug = false;
 const DEBUG_ASSIGNMENT_NAME = "";
-const SEMESTER = "FALL_2025";
+const CURRENT_SEMESTER = "FALL_2025";
 
 interface AppProps {
   ctx: ContentScriptContext;
@@ -58,6 +59,7 @@ export default function App({ ctx }: AppProps) {
   const [showWrappedPopup, setShowWrappedPopup] = useState(false);
   const personalStatsRef = useRef<storage.PersonalStats | null>(null);
   const watchTimeStartRef = useRef(0);
+  const wrappedPopupUiRef = useRef<any>(null);
 
   useEffect(() => {
     const loadData = async () => {
@@ -129,8 +131,15 @@ export default function App({ ctx }: AppProps) {
         }
       }
 
+      console.log(
+        "Wrapped: wrappedPopupVisible_S25 =",
+        allSettings.wrappedPopupVisible_S25,
+      );
       if (allSettings.wrappedPopupVisible_S25) {
+        console.log("Wrapped: Checking feature flags");
         checkWrappedFeatureFlag();
+      } else {
+        console.log("Wrapped: Popup disabled, not checking feature flags");
       }
     };
 
@@ -138,21 +147,28 @@ export default function App({ ctx }: AppProps) {
   }, []);
 
   const checkWrappedFeatureFlag = async () => {
+    console.log("Wrapped: Starting feature flag check");
     try {
       const response = await fetch(
         "https://www.aidenjohnson.dev/api/help-me-bevo-fflags",
       );
+      console.log("Wrapped: Feature flag response status:", response.status);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
       const flags = await response.json();
+      console.log("Wrapped: Feature flags received:", flags);
+
       if (
         flags.Wrapped ||
         (settings.volume === 0 && !settings.themedAnims && !settings.other)
       ) {
+        console.log("Wrapped: Conditions met, showing popup");
         setShowWrappedPopup(true);
+      } else {
+        console.log("Wrapped: Conditions not met, not showing popup");
       }
     } catch (err) {
-      console.error("Error fetching feature flags:", err);
+      console.error("Wrapped: Error fetching feature flags:", err);
     }
   };
 
@@ -215,9 +231,9 @@ export default function App({ ctx }: AppProps) {
 
     const watchDuration = Date.now() / 1000 - watchTimeStartRef.current;
     if (personalStatsRef.current) {
-      ensureSemesterExists(personalStatsRef.current, SEMESTER);
+      ensureSemesterExists(personalStatsRef.current, CURRENT_SEMESTER);
 
-      personalStatsRef.current[SEMESTER].timeWatched += Math.floor(
+      personalStatsRef.current[CURRENT_SEMESTER].timeWatched += Math.floor(
         watchDuration + 0.5,
       );
       await storage.setSetting("personalStats", personalStatsRef.current);
@@ -256,9 +272,9 @@ export default function App({ ctx }: AppProps) {
   const logStatistics = async (type: ButtonType) => {
     if (!personalStatsRef.current) return;
 
-    ensureSemesterExists(personalStatsRef.current, SEMESTER);
+    ensureSemesterExists(personalStatsRef.current, CURRENT_SEMESTER);
 
-    const stats = personalStatsRef.current[SEMESTER];
+    const stats = personalStatsRef.current[CURRENT_SEMESTER];
     const now = new Date();
 
     const dayOfWeek = now.getDay();
@@ -381,15 +397,34 @@ export default function App({ ctx }: AppProps) {
   }
 
   const handleWrappedShow = async () => {
+    console.log("Wrapped: Show button clicked");
     sendAnalytic("wrappedshow");
     await storage.setSetting("wrappedPopupVisible_S25", false);
     setShowWrappedPopup(false);
-    browser.runtime.sendMessage({ action: "openWrapped" });
+    if (wrappedPopupUiRef.current) {
+      wrappedPopupUiRef.current.remove();
+      wrappedPopupUiRef.current = null;
+    }
+    browser.runtime.sendMessage("openWrapped");
   };
 
   const handleWrappedHide = async () => {
+    console.log("Wrapped: Hide/Don't show again button clicked");
     await storage.setSetting("wrappedPopupVisible_S25", false);
     setShowWrappedPopup(false);
+    if (wrappedPopupUiRef.current) {
+      wrappedPopupUiRef.current.remove();
+      wrappedPopupUiRef.current = null;
+    }
+  };
+
+  const handleWrappedClose = () => {
+    console.log("Wrapped: X button clicked - just closing temporarily");
+    setShowWrappedPopup(false);
+    if (wrappedPopupUiRef.current) {
+      wrappedPopupUiRef.current.remove();
+      wrappedPopupUiRef.current = null;
+    }
   };
 
   useButtonObserver({
@@ -403,6 +438,51 @@ export default function App({ ctx }: AppProps) {
     onButtonClick: (type: ButtonType) => handleDisplayBevo(type, false),
   });
 
+  useEffect(() => {
+    const createWrappedPopup = async () => {
+      if (showWrappedPopup && !wrappedPopupUiRef.current) {
+        console.log("Wrapped: Creating shadow root for popup");
+
+        const ui = await createShadowRootUi(ctx, {
+          name: "wrapped-popup",
+          position: "inline",
+          anchor: "body",
+          onMount: (container) => {
+            console.log("Wrapped: Shadow root mounted, container:", container);
+
+            // Create a wrapper div to avoid React warnings
+            const app = document.createElement("div");
+            container.append(app);
+
+            const root = ReactDOM.createRoot(app);
+            root.render(
+              <WrappedPopup
+                onShowClick={handleWrappedShow}
+                onHideClick={handleWrappedHide}
+                onClose={handleWrappedClose}
+              />,
+            );
+            return root;
+          },
+          onRemove: (root) => {
+            console.log("Wrapped: Shadow root removing, root:", root);
+            root?.unmount();
+          },
+        });
+
+        wrappedPopupUiRef.current = ui;
+        console.log("Wrapped: Shadow root UI created, mounting...", ui);
+        ui.mount();
+      } else if (!showWrappedPopup && wrappedPopupUiRef.current) {
+        console.log("Wrapped: Removing shadow root popup");
+        wrappedPopupUiRef.current.remove();
+        wrappedPopupUiRef.current = null;
+      }
+    };
+
+    createWrappedPopup();
+  }, [showWrappedPopup]);
+
   return (
     <>
       {isPlaying && (
@@ -415,14 +495,6 @@ export default function App({ ctx }: AppProps) {
           onSkip={handleVideoEnd}
           showAssignmentName={settings.assignmentName}
           textHideTimeout={1.5}
-        />
-      )}
-
-      {showWrappedPopup && (
-        <WrappedPopup
-          onShowClick={handleWrappedShow}
-          onHideClick={handleWrappedHide}
-          onClose={() => setShowWrappedPopup(false)}
         />
       )}
     </>
