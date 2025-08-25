@@ -107,19 +107,21 @@ export default function App({ ctx }: AppProps) {
 
             const assignmentName = getAssignmentName(type as ButtonType);
             let videoUrl = fullVideoURL;
+            let displayAssignmentName = assignmentName;
 
             if (allSettings.themedAnims) {
               const isValid = await isValidVideo(themedVideoURL);
               if (isValid) {
                 videoUrl = themedVideoURL;
+                displayAssignmentName = null;
               } else if (assignmentName && allSettings.assignmentName) {
                 videoUrl = blankVideoURL;
-                setCurrentAssignmentName(assignmentName);
+                displayAssignmentName = assignmentName;
               }
             }
 
             setCurrentVideoUrl(videoUrl);
-            setCurrentAssignmentName(assignmentName);
+            setCurrentAssignmentName(displayAssignmentName);
             setIsPlaying(true);
             setWatchTime(Date.now() / 1000);
             watchTimeStartRef.current = Date.now() / 1000;
@@ -156,8 +158,7 @@ export default function App({ ctx }: AppProps) {
         setShowWrappedPopup(true);
       } else {
       }
-    } catch (err) {
-    }
+    } catch (err) {}
   };
 
   const handleDisplayBevo = async (
@@ -174,19 +175,21 @@ export default function App({ ctx }: AppProps) {
 
     const assignmentName = getAssignmentName(type);
     let videoUrl = fullVideoURL;
+    let displayAssignmentName = assignmentName;
 
     if (settings.themedAnims) {
       const isValid = await isValidVideo(themedVideoURL);
       if (isValid) {
         videoUrl = themedVideoURL;
+        displayAssignmentName = null;
       } else if (assignmentName && settings.assignmentName) {
         videoUrl = blankVideoURL;
-        setCurrentAssignmentName(assignmentName);
+        displayAssignmentName = assignmentName;
       }
     }
 
     setCurrentVideoUrl(videoUrl);
-    setCurrentAssignmentName(assignmentName);
+    setCurrentAssignmentName(displayAssignmentName);
     setIsPlaying(true);
     setWatchTime(Date.now() / 1000);
     watchTimeStartRef.current = Date.now() / 1000;
@@ -426,13 +429,11 @@ export default function App({ ctx }: AppProps) {
   useEffect(() => {
     const createWrappedPopup = async () => {
       if (showWrappedPopup && !wrappedPopupUiRef.current) {
-
         const ui = await createShadowRootUi(ctx, {
           name: "wrapped-popup",
           position: "inline",
           anchor: "body",
           onMount: (container) => {
-
             // Create a wrapper div to avoid React warnings
             const app = document.createElement("div");
             container.append(app);
