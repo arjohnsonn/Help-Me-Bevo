@@ -77,6 +77,23 @@ export default defineBackground(() => {
       return true;
     }
 
+    if (message === "quote") {
+      // Fetch quote from the API
+      (async () => {
+        try {
+          const response = await fetch(
+            "https://www.aidenjohnson.dev/api/help-me-bevo-quotes"
+          );
+          const data = await response.json();
+          sendResponse(data);
+        } catch (err) {
+          console.error("Error fetching quotes:", err);
+          sendResponse("Hook 'em");
+        }
+      })();
+      return true; // Indicate async response
+    }
+
     if (typeof message === "string") {
       sendToGA(message);
       sendResponse({ received: true });

@@ -48,6 +48,7 @@ function App() {
 
   const [imageVisible, setImageVisible] = useState(false);
   const [version, setVersion] = useState("");
+  const [quote, setQuote] = useState("Hook 'em");
 
   useEffect(() => {
     const loadSettings = async () => {
@@ -58,8 +59,18 @@ function App() {
       const manifest = browser.runtime.getManifest();
       setVersion(manifest.version);
     };
+    const loadQuote = async () => {
+      try {
+        const response = await browser.runtime.sendMessage("quote");
+        setQuote(response || "Hook 'em");
+      } catch (error) {
+        console.error("Error fetching quote:", error);
+        setQuote("Hook 'em");
+      }
+    };
     loadSettings();
     loadVersion();
+    loadQuote();
   }, []);
 
   const updateSetting = async (key: string, value: any) => {
@@ -145,7 +156,7 @@ function App() {
 
             <div className="w-full rounded-lg bg-black/30 px-3 py-2">
               <p className="text-md text-center font-medium text-white">
-                Hook 'em
+                {quote}
               </p>
             </div>
 
