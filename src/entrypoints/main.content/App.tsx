@@ -114,10 +114,19 @@ export default function App({ ctx }: AppProps) {
               if (isValid) {
                 videoUrl = themedVideoURL;
                 displayAssignmentName = null;
-              } else if (assignmentName && allSettings.assignmentName) {
+              } else {
                 videoUrl = blankVideoURL;
-                displayAssignmentName = assignmentName;
+                if (assignmentName && allSettings.assignmentName) {
+                  displayAssignmentName = assignmentName;
+                } else {
+                  displayAssignmentName = null;
+                }
               }
+            } else if (allSettings.assignmentName && assignmentName) {
+              videoUrl = blankVideoURL;
+              displayAssignmentName = assignmentName;
+            } else {
+              displayAssignmentName = null;
             }
 
             setCurrentVideoUrl(videoUrl);
@@ -182,10 +191,19 @@ export default function App({ ctx }: AppProps) {
       if (isValid) {
         videoUrl = themedVideoURL;
         displayAssignmentName = null;
-      } else if (assignmentName && settings.assignmentName) {
+      } else {
         videoUrl = blankVideoURL;
-        displayAssignmentName = assignmentName;
+        if (assignmentName && settings.assignmentName) {
+          displayAssignmentName = assignmentName;
+        } else {
+          displayAssignmentName = null;
+        }
       }
+    } else if (settings.assignmentName && assignmentName) {
+      videoUrl = blankVideoURL;
+      displayAssignmentName = assignmentName;
+    } else {
+      displayAssignmentName = null;
     }
 
     setCurrentVideoUrl(videoUrl);
