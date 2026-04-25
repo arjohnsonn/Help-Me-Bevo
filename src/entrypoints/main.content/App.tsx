@@ -142,9 +142,8 @@ export default function App({ ctx }: AppProps) {
         }
       }
 
-      if (allSettings.wrappedPopupVisible_S25) {
+      if (allSettings.wrappedPopupVisible_S26) {
         checkWrappedFeatureFlag();
-      } else {
       }
     };
 
@@ -159,13 +158,11 @@ export default function App({ ctx }: AppProps) {
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
       const flags = await response.json();
-
       if (
         flags.Wrapped ||
         (settings.volume === 0 && !settings.themedAnims && !settings.other)
       ) {
         setShowWrappedPopup(true);
-      } else {
       }
     } catch (err) {}
   };
@@ -407,7 +404,7 @@ export default function App({ ctx }: AppProps) {
 
   const handleWrappedShow = async () => {
     sendAnalytic("wrappedshow");
-    await storage.setSetting("wrappedPopupVisible_S25", false);
+    await storage.setSetting("wrappedPopupVisible_S26", false);
     setShowWrappedPopup(false);
     if (wrappedPopupUiRef.current) {
       wrappedPopupUiRef.current.remove();
@@ -417,7 +414,7 @@ export default function App({ ctx }: AppProps) {
   };
 
   const handleWrappedHide = async () => {
-    await storage.setSetting("wrappedPopupVisible_S25", false);
+    await storage.setSetting("wrappedPopupVisible_S26", false);
     setShowWrappedPopup(false);
     if (wrappedPopupUiRef.current) {
       wrappedPopupUiRef.current.remove();

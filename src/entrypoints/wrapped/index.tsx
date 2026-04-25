@@ -20,7 +20,7 @@ import * as storage from "@/lib/storage";
 import Aurora from "@/components/Aurora";
 import { browser } from "wxt/browser";
 
-const WRAPPED_SEMESTER = "SPRING_2025";
+const WRAPPED_SEMESTER = "FALL_2025";
 
 type Slide = {
   id: number;
@@ -127,7 +127,7 @@ function Wrapped() {
       textAnimation: "fadeIn",
       text: "Before we begin:",
       subtitle:
-        "- This feature was not added until mid semester, so some data may be missing or off. Next semester should be a ton better with full data!<br />- We do NOT store any of your data. All data is stored locally on your device and is not sent to us.<br />- Since this is a new feature, it may be buggy. Feel free to DM me (IG in extension popup) for any concerns<br />- You can view this at any time by going into the extension's menu.<br /><br /><b>Now, let's get started!</b>",
+        "- This feature is still in development, so some data may be missing or off. Next school year should be a ton better with full data!<br />- We do NOT store any of your data. All data is stored locally on your device and is not sent to us.<br />- Since this is a new feature, it may be buggy. Feel free to DM me (IG in extension popup) for any concerns<br />- You can view this at any time by going into the extension's menu.<br /><br /><b>Now, let's get started!</b>",
       audioStartTime: 52,
     },
     {
@@ -194,7 +194,7 @@ function Wrapped() {
       id: 12,
       videoSrc: `${baseURL}/BlackOrangeRectangles.webm`,
       textAnimation: "slideUp",
-      text: "Thanks for using <b>Help Me Bevo</b> this semester!",
+      text: "Thanks for using <b>Help Me Bevo</b> this school year!",
       subtitle: `
         If you enjoyed Wrapped and the extension, please leave a review! 🧡
         <br /><br />
@@ -230,7 +230,21 @@ function Wrapped() {
           rel="noopener noreferrer"
         >
           Like the extension? Click here to leave a rating!
-        </a>`,
+        </a>
+        <br />
+        <span style="font-style: italic; font-size: 0.85em;">
+          also follow me on
+          <a
+            style="
+              font-style: italic;
+              text-decoration: underline;
+              color: #c77d40;
+            "
+            href="https://www.instagram.com/aidenn.johnson/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >instagram!</a>
+        </span>`,
       audioStartTime: slideDuration * 11,
     },
   ]);
@@ -321,7 +335,7 @@ function Wrapped() {
         const updated = [...prev];
         updated[2] = {
           ...updated[2],
-          text: `Every day was a fight this semester. You submitted the most assignments on <b>${busiestDayName}!</b>`,
+          text: `Every day was a fight this school year. You submitted the most assignments on <b>${busiestDayName}!</b>`,
           subtitle: getSubtitle("busiestDay", busiestDayIndex),
         };
         updated[3] = {
@@ -683,7 +697,10 @@ function Wrapped() {
     const currentVideo = videoRefs.current[currentSlide];
     if (currentVideo) {
       const onTimeUpdate = () => {
-        if (currentVideo.currentTime > currentVideo.duration - 0.1) {
+        if (
+          currentVideo.currentTime > currentVideo.duration - 0.1 &&
+          currentSlide !== slides.length - 1
+        ) {
           resetAudioToSlideStart();
         }
       };
@@ -833,12 +850,9 @@ function Wrapped() {
                 muted
                 playsInline
                 onEnded={() => {
-                  if (isAutoplay) {
-                    if (index === slides.length - 1) {
-                      goToSlide(0);
-                    } else {
-                      nextSlide();
-                    }
+                  const isLastSlide = index === slides.length - 1;
+                  if (isAutoplay && !isLastSlide) {
+                    nextSlide();
                   } else {
                     const video = videoRefs.current[index];
                     if (video) {
@@ -847,7 +861,7 @@ function Wrapped() {
                         .play()
                         .catch((e) => console.error("Video replay error:", e));
                     }
-                    if (isPlaying) {
+                    if (isPlaying && !isLastSlide) {
                       resetAudioToSlideStart();
                     }
                   }

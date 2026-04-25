@@ -139,8 +139,8 @@ export const personalStats = storage.defineItem<PersonalStats>(
   },
 );
 
-export const wrappedPopupVisible_S25 = storage.defineItem<boolean>(
-  "local:wrappedPopupVisible_S25",
+export const wrappedPopupVisible_S26 = storage.defineItem<boolean>(
+  "local:wrappedPopupVisible_S26",
   {
     fallback: true,
   },
@@ -190,7 +190,7 @@ export async function getAllSettings() {
     clientId.getValue(),
     playing.getValue(),
     personalStats.getValue(),
-    wrappedPopupVisible_S25.getValue(),
+    wrappedPopupVisible_S26.getValue(),
   ]);
 
   return {
@@ -214,7 +214,7 @@ export async function getAllSettings() {
     clientId: clientIdVal,
     playing: playingVal,
     personalStats: personalStatsVal,
-    wrappedPopupVisible_S25: wrappedPopupVisibleVal,
+    wrappedPopupVisible_S26: wrappedPopupVisibleVal,
   };
 }
 
@@ -280,8 +280,8 @@ export async function setSetting(key: string, value: any) {
     case "personalStats":
       await personalStats.setValue(value);
       break;
-    case "wrappedPopupVisible_S25":
-      await wrappedPopupVisible_S25.setValue(value);
+    case "wrappedPopupVisible_S26":
+      await wrappedPopupVisible_S26.setValue(value);
       break;
   }
 }
@@ -307,5 +307,5 @@ export const storageItems = {
   clientId,
   playing,
   personalStats,
-  wrappedPopupVisible_S25,
+  wrappedPopupVisible_S26,
 };

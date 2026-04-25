@@ -99,7 +99,7 @@ function App() {
   };
 
   return (
-    <div className="relative h-87 w-96 bg-neutral-900">
+    <div className="relative h-100 w-96 bg-neutral-900">
       <Aurora
         colorStops={["#BF5700", "#5B2F0B", "#5E3F1C"]}
         blend={1}
@@ -159,6 +159,13 @@ function App() {
                 {quote}
               </p>
             </div>
+
+            <Button
+              className="h-7 w-full bg-[#bf5700] font-bold"
+              onClick={() => browser.runtime.sendMessage("openWrapped")}
+            >
+              View Wrapped
+            </Button>
 
             <div className="flex w-full flex-row gap-2">
               <Dialog>
