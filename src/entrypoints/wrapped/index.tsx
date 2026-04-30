@@ -21,6 +21,20 @@ import Aurora from "@/components/Aurora";
 import { browser } from "wxt/browser";
 
 const WRAPPED_SEMESTER = "FALL_2025";
+const RECAP_TITLE = "Your school year, wrapped";
+
+const escapeHtml = (s: string) =>
+  s.replace(
+    /[&<>"']/g,
+    (c) =>
+      ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;",
+      }[c]!),
+  );
 
 type Slide = {
   id: number;
@@ -215,6 +229,14 @@ function Wrapped() {
     },
     {
       id: 13,
+      videoSrc: `${baseURL}/BlackOrangeRectangles.webm`,
+      textAnimation: "fadeIn",
+      text: RECAP_TITLE,
+      subtitle: "",
+      audioStartTime: slideDuration * 11,
+    },
+    {
+      id: 14,
       videoSrc: `${baseURL}/DoubleHorizontalRibbons.webm`,
       textAnimation: "fadeIn",
       text: "Have a great summer break!",
@@ -244,8 +266,11 @@ function Wrapped() {
             target="_blank"
             rel="noopener noreferrer"
           >instagram!</a>
+        </span>
+        <span style="display: block; margin-top: 16px; font-size: 1.25em; font-weight: 700;">
+          Thank you so much for using Help Me Bevo!
         </span>`,
-      audioStartTime: slideDuration * 11,
+      audioStartTime: slideDuration * 12,
     },
   ]);
 
@@ -352,20 +377,24 @@ function Wrapped() {
         ([name]) => name !== "undefined"
       ) as [string, number][];
 
+      let topCourse: string | null = null;
+
       if (courseEntries.length === 0) {
         // No courses to show, mark this slide for removal
         slidesToRemove.push(4);
       } else {
         // Find top course and update slide
-        const [topCourse, topCount] = courseEntries.reduce((prev, curr) =>
+        const [winner, topCount] = courseEntries.reduce((prev, curr) =>
           curr[1] > prev[1] ? curr : prev
         );
+        topCourse = winner;
+        const safeTopCourse = escapeHtml(winner);
 
         setSlides((prev) => {
           const updated = [...prev];
           updated[4] = {
             ...updated[4],
-            text: `Some classes can be a piece of work. Your most submitted course was <b>${topCourse}</b> with <b>${topCount}</b> submissions!`,
+            text: `Some classes can be a piece of work. Your most submitted course was <b>${safeTopCourse}</b> with <b>${topCount}</b> submissions!`,
           };
           return updated;
         });
@@ -381,10 +410,12 @@ function Wrapped() {
       if (earliest.timeLeft === -1) {
         slidesToRemove.push(5);
       } else {
-        const cleanName = earliest.name
-          .replace(/[^\x20-\x7E]/g, "")
-          .replace(/\n/g, "")
-          .trim();
+        const cleanName = escapeHtml(
+          earliest.name
+            .replace(/[^\x20-\x7E]/g, "")
+            .replace(/\n/g, "")
+            .trim(),
+        );
 
         const totalSeconds = earliest.timeLeft;
         const days = Math.floor(totalSeconds / 86400);
@@ -421,10 +452,12 @@ function Wrapped() {
       if (procrastinated.timeLeft === -1) {
         slidesToRemove.push(6);
       } else {
-        const cleanProcrastinatedName = procrastinated.name
-          .replace(/[^\x20-\x7E]/g, "")
-          .replace(/\n/g, "")
-          .trim();
+        const cleanProcrastinatedName = escapeHtml(
+          procrastinated.name
+            .replace(/[^\x20-\x7E]/g, "")
+            .replace(/\n/g, "")
+            .trim(),
+        );
 
         const timeLeft = procrastinated.timeLeft;
         if (timeLeft >= 0) {
@@ -482,7 +515,7 @@ function Wrapped() {
       }
 
       // last minute submissions
-      const lastMinuteCount = semester.lastMinuteSubmissions as number;
+      const lastMinuteCount = (semester.lastMinuteSubmissions as number) ?? 0;
       setSlides((prev) => {
         const updated = [...prev];
         updated[7] = {
@@ -495,8 +528,8 @@ function Wrapped() {
         return updated;
       });
 
-      const weekdaySubmissions = semester.weekdaySubmissions as number;
-      const weekendSubmissions = semester.weekendSubmissions as number;
+      const weekdaySubmissions = (semester.weekdaySubmissions as number) ?? 0;
+      const weekendSubmissions = (semester.weekendSubmissions as number) ?? 0;
 
       setSlides((prev) => {
         const updated = [...prev];
@@ -512,7 +545,7 @@ function Wrapped() {
       });
 
       // handle total time watched and format to minutes/seconds
-      const timeWatchedSec = semester.timeWatched as number;
+      const timeWatchedSec = (semester.timeWatched as number) ?? 0;
       const mins = Math.floor(timeWatchedSec / 60);
       const secs = timeWatchedSec % 60;
       const formattedWatch = mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
@@ -552,6 +585,41 @@ function Wrapped() {
           });
         });
       }
+
+      // Build the recap (overview) slide content
+      const recapCard = (label: string, value: string) => `
+        <span style="display: block; background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; padding: 12px 14px; text-align: left;">
+          <span style="display: block; font-size: 0.65em; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 4px;">${label}</span>
+          <span style="display: block; font-size: 1.2em; font-weight: 800; color: #c77d40; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${value}</span>
+        </span>
+      `;
+
+      const totalSubmissions = weekdaySubmissions + weekendSubmissions;
+
+      const cards: string[] = [
+        recapCard("Busiest day", busiestDayName),
+        recapCard("Busiest hour", busiestHourLabel),
+        recapCard("Total submissions", `${totalSubmissions}`),
+        recapCard("Time watched", formattedWatch),
+      ];
+      if (topCourse) cards.push(recapCard("Top course", escapeHtml(topCourse)));
+      cards.push(recapCard("Buzzer beaters", `${lastMinuteCount}`));
+      cards.push(recapCard("Weekday submissions", `${weekdaySubmissions}`));
+      cards.push(recapCard("Weekend submissions", `${weekendSubmissions}`));
+
+      const recapSubtitle = `
+        <span style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: 320px; margin: 0 auto;">
+          ${cards.join("")}
+        </span>
+      `;
+
+      setSlides((prev) => {
+        const updated = [...prev];
+        const recapIdx = updated.findIndex((s) => s.text === RECAP_TITLE);
+        if (recapIdx === -1) return updated;
+        updated[recapIdx] = { ...updated[recapIdx], subtitle: recapSubtitle };
+        return updated;
+      });
     };
 
     loadStats();
