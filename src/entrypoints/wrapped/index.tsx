@@ -140,8 +140,17 @@ function Wrapped() {
       videoSrc: `${baseURL}/RibbonOrangeVert.webm`,
       textAnimation: "fadeIn",
       text: "Before we begin:",
-      subtitle:
-        "- This feature is still in development, so some data may be missing or off. Next school year should be a ton better with full data!<br />- We do NOT store any of your data. All data is stored locally on your device and is not sent to us.<br />- Since this is a new feature, it may be buggy. Feel free to DM me (IG in extension popup) for any concerns<br />- You can view this at any time by going into the extension's menu.<br /><br /><b>Now, let's get started!</b>",
+      subtitle: `
+        <span style="display:block;">This Wrapped covers the full <b>2025–2026 school year</b> (Fall 2025 and Spring 2026).</span>
+        <span style="display:block;border-top:1px solid rgba(255,255,255,0.2);margin:10px 0;"></span>
+        <span style="display:block;">This feature is still in development, so some data may be missing or off. Next school year should be a ton better with full data!</span>
+        <span style="display:block;border-top:1px solid rgba(255,255,255,0.2);margin:10px 0;"></span>
+        <span style="display:block;">We do NOT store any of your data. All data is stored locally on your device and is not sent to us.</span>
+        <span style="display:block;border-top:1px solid rgba(255,255,255,0.2);margin:10px 0;"></span>
+        <span style="display:block;">Since this is a new feature, it may be buggy. Feel free to DM me (IG in extension popup) for any concerns.</span>
+        <span style="display:block;border-top:1px solid rgba(255,255,255,0.2);margin:10px 0;"></span>
+        <span style="display:block;">You can view this at any time by going into the extension's menu.</span>
+      `,
       audioStartTime: 52,
     },
     {
@@ -881,7 +890,7 @@ function Wrapped() {
             {!isInitialized && (
               <motion.div
                 key="start-button"
-                className="absolute inset-x-0 top-[81%] z-50 flex items-center justify-center"
+                className="absolute inset-x-0 bottom-4 z-50 flex items-center justify-center"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1, transition: { duration: 1, delay: 3 } }}
                 exit={{ opacity: 0, transition: { duration: 0 } }}
