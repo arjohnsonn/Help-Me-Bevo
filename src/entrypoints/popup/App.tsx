@@ -49,6 +49,7 @@ function App() {
   const [imageVisible, setImageVisible] = useState(false);
   const [version, setVersion] = useState("");
   const [quote, setQuote] = useState("Hook 'em");
+  const [wrappedEnabled, setWrappedEnabled] = useState(false);
 
   useEffect(() => {
     const loadSettings = async () => {
@@ -68,9 +69,28 @@ function App() {
         setQuote("Hook 'em");
       }
     };
+    const loadWrappedFlag = async () => {
+      try {
+        const response = await fetch(
+          "https://www.aidenjohnson.dev/api/help-me-bevo-fflags",
+        );
+        if (!response.ok) return;
+        const flags = await response.json();
+        if (flags.Wrapped) setWrappedEnabled(true);
+      } catch {}
+    };
     loadSettings();
     loadVersion();
     loadQuote();
+    loadWrappedFlag();
+  }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key.toLowerCase() === "w") setWrappedEnabled((prev) => !prev);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
   const updateSetting = async (key: string, value: any) => {
@@ -99,7 +119,7 @@ function App() {
   };
 
   return (
-    <div className="relative h-100 w-96 bg-neutral-900">
+    <div className={`relative w-96 bg-neutral-900 ${wrappedEnabled ? "h-100" : "h-87"}`}>
       <Aurora
         colorStops={["#BF5700", "#5B2F0B", "#5E3F1C"]}
         blend={1}
@@ -160,12 +180,14 @@ function App() {
               </p>
             </div>
 
-            <Button
-              className="h-7 w-full bg-[#bf5700] font-bold"
-              onClick={() => browser.runtime.sendMessage("openWrapped")}
-            >
-              View Wrapped
-            </Button>
+            {wrappedEnabled && (
+              <Button
+                className="h-7 w-full bg-[#bf5700] font-bold"
+                onClick={() => browser.runtime.sendMessage("openWrapped")}
+              >
+                View Wrapped
+              </Button>
+            )}
 
             <div className="flex w-full flex-row gap-2">
               <Dialog>
