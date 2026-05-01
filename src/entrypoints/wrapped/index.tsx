@@ -261,24 +261,7 @@ function Wrapped() {
           rel="noopener noreferrer"
         >
           Like the extension? Click here to leave a rating!
-        </a>
-        <br />
-        <span style="font-style: italic; font-size: 0.85em;">
-          also follow me on
-          <a
-            style="
-              font-style: italic;
-              text-decoration: underline;
-              color: #c77d40;
-            "
-            href="https://www.instagram.com/aidenn.johnson/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >instagram!</a>
-        </span>
-        <span style="display: block; margin-top: 16px; font-size: 1.25em; font-weight: 700;">
-          Thank you so much for using Help Me Bevo!
-        </span>`,
+        </a>`,
       audioStartTime: slideDuration * 12,
     },
   ]);

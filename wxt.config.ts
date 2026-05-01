@@ -8,7 +8,7 @@ export default defineConfig({
   modules: ["@wxt-dev/module-react"],
   manifest: {
     name: "Help Me Bevo",
-    version: "5.0.3",
+    version: "5.0.4",
     description: "Tired of being demotivated to get assignments done?\n",
     permissions: ["storage"],
     action: {
