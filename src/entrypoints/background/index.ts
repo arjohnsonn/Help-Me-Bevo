@@ -106,6 +106,6 @@ export default defineBackground(() => {
     if (details.reason === "install") {
       sendToGA("install");
     }
-    browser.storage.local.remove("wrappedPopupVisible_S25");
+    browser.storage.local.remove("wrappedPopupVisible_S26");
   });
 });

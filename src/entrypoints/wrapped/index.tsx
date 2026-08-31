@@ -20,7 +20,7 @@ import * as storage from "@/lib/storage";
 import Aurora from "@/components/Aurora";
 import { browser } from "wxt/browser";
 
-const WRAPPED_SEMESTER = "FALL_2025";
+const WRAPPED_SEMESTER = "FALL_2026";
 const RECAP_TITLE = "Your school year, wrapped";
 
 const escapeHtml = (s: string) =>
@@ -141,9 +141,9 @@ function Wrapped() {
       textAnimation: "fadeIn",
       text: "Before we begin:",
       subtitle: `
-        <span style="display:block;">This Wrapped covers the full <b>2025–2026 school year</b> (Fall 2025 and Spring 2026).</span>
+        <span style="display:block;">This Wrapped covers the full <b>2026–2027 school year</b> (Fall 2026 and Spring 2027).</span>
         <span style="display:block;border-top:1px solid rgba(255,255,255,0.2);margin:10px 0;"></span>
-        <span style="display:block;">This feature is still in development, so some data may be missing or off. Next school year should be a ton better with full data!</span>
+        <span style="display:block;">Some data may be missing or off if you installed the extension partway through the year.</span>
         <span style="display:block;border-top:1px solid rgba(255,255,255,0.2);margin:10px 0;"></span>
         <span style="display:block;">We do NOT store any of your data. All data is stored locally on your device and is not sent to us.</span>
         <span style="display:block;border-top:1px solid rgba(255,255,255,0.2);margin:10px 0;"></span>
@@ -304,7 +304,6 @@ function Wrapped() {
         Object.keys(personalStats[WRAPPED_SEMESTER].busiestDay).length === 0 ||
         Object.keys(personalStats[WRAPPED_SEMESTER].busiestHour).length === 0
       ) {
-        console.log("No personal stats found");
         return;
       }
       setPersonalStats(personalStats);

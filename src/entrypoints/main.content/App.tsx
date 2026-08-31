@@ -19,7 +19,7 @@ const blankVideoURL = "https://aidenjohnson.dev/Images/BlankBevo.mp4";
 
 const debug = false;
 const DEBUG_ASSIGNMENT_NAME = "";
-const CURRENT_SEMESTER = "FALL_2025";
+const CURRENT_SEMESTER = "FALL_2026";
 
 interface AppProps {
   ctx: ContentScriptContext;
@@ -142,7 +142,7 @@ export default function App({ ctx }: AppProps) {
         }
       }
 
-      if (allSettings.wrappedPopupVisible_S26) {
+      if (allSettings.wrappedPopupVisible_F26) {
         checkWrappedFeatureFlag();
       }
     };
@@ -158,10 +158,7 @@ export default function App({ ctx }: AppProps) {
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
       const flags = await response.json();
-      if (
-        flags.Wrapped ||
-        (settings.volume === 0 && !settings.themedAnims && !settings.other)
-      ) {
+      if (flags.Wrapped) {
         setShowWrappedPopup(true);
       }
     } catch (err) {}
@@ -404,7 +401,7 @@ export default function App({ ctx }: AppProps) {
 
   const handleWrappedShow = async () => {
     sendAnalytic("wrappedshow");
-    await storage.setSetting("wrappedPopupVisible_S26", false);
+    await storage.setSetting("wrappedPopupVisible_F26", false);
     setShowWrappedPopup(false);
     if (wrappedPopupUiRef.current) {
       wrappedPopupUiRef.current.remove();
@@ -414,7 +411,7 @@ export default function App({ ctx }: AppProps) {
   };
 
   const handleWrappedHide = async () => {
-    await storage.setSetting("wrappedPopupVisible_S26", false);
+    await storage.setSetting("wrappedPopupVisible_F26", false);
     setShowWrappedPopup(false);
     if (wrappedPopupUiRef.current) {
       wrappedPopupUiRef.current.remove();
